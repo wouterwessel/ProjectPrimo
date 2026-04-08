@@ -272,6 +272,47 @@ export class BootScene extends Phaser.Scene {
       g.generateTexture(key, TILE_SIZE, TILE_SIZE);
       g.destroy();
     });
+
+    // Jan Vayne — pianist with long grey hair
+    const jv = this.make.graphics({ add: false });
+    jv.fillStyle(0x1A1A1A);
+    jv.fillRoundedRect(6, 10, 20, 18, 3);
+    jv.fillStyle(0xFFDDB0);
+    jv.fillCircle(16, 8, 7);
+    // Long grey hair — top + sides falling to shoulders
+    jv.fillStyle(0x9E9E9E);
+    jv.fillRect(9, 1, 14, 6);
+    jv.fillRect(7, 1, 4, 16);
+    jv.fillRect(21, 1, 4, 16);
+    jv.fillStyle(0x000000);
+    jv.fillRect(12, 7, 2, 2);
+    jv.fillRect(18, 7, 2, 2);
+    jv.fillStyle(0x333333);
+    jv.fillRect(10, 28, 5, 4);
+    jv.fillRect(18, 28, 5, 4);
+    jv.generateTexture('npc_jan_vayne', TILE_SIZE, TILE_SIZE);
+    jv.destroy();
+
+    // Chef-kok Thijmen — white uniform with chef's hat (koksmuts)
+    const chef = this.make.graphics({ add: false });
+    chef.fillStyle(0xF5F5F5);
+    chef.fillRoundedRect(6, 10, 20, 18, 3);
+    chef.fillStyle(0xFFDDB0);
+    chef.fillCircle(16, 8, 7);
+    // Koksmuts (toque) — tall white hat
+    chef.fillStyle(0xFFFFFF);
+    chef.fillRoundedRect(9, -4, 14, 10, 3);
+    chef.fillRect(8, 2, 16, 3);
+    // Eyes
+    chef.fillStyle(0x000000);
+    chef.fillRect(12, 7, 2, 2);
+    chef.fillRect(18, 7, 2, 2);
+    // Legs
+    chef.fillStyle(0x333333);
+    chef.fillRect(10, 28, 5, 4);
+    chef.fillRect(18, 28, 5, 4);
+    chef.generateTexture('npc_chef', TILE_SIZE, TILE_SIZE);
+    chef.destroy();
   }
 
   generateUITextures() {
@@ -359,6 +400,8 @@ export class BootScene extends Phaser.Scene {
       laadpaal: { color: 0x4CAF50, pattern: 'solid' },
       art_quinn: { color: 0xFFD700, pattern: 'solid' },
       counter: { color: 0x6D4C41, pattern: 'solid' },
+      piano: { color: 0x1A1A1A, pattern: 'solid' },
+      piano_keys: { color: 0x1A1A1A, pattern: 'piano' },
     };
 
     Object.entries(tileTypes).forEach(([key, { color, pattern }]) => {
@@ -397,6 +440,16 @@ export class BootScene extends Phaser.Scene {
           g.fillRect(4, 4, 3, 3);
           g.fillRect(20, 14, 2, 2);
           g.fillRect(12, 24, 3, 2);
+          break;
+        case 'piano':
+          g.fillStyle(0xFFFFFF, 0.9);
+          for (let i = 0; i < 6; i++) {
+            g.fillRect(2 + i * 5, TILE_SIZE - 10, 3, 8);
+          }
+          g.fillStyle(0x333333, 0.6);
+          for (let i = 0; i < 5; i++) {
+            g.fillRect(4 + i * 5, TILE_SIZE - 10, 2, 5);
+          }
           break;
         case 'grass':
           g.fillStyle(0x558B2F, 0.3);

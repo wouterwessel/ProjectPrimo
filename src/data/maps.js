@@ -20,15 +20,17 @@ import { TILE_SIZE } from '../utils/constants.js';
 //   E = encounter zone (walkable, random battles)
 //   H = heal point
 //   T = transition to another zone
+//   V = vleugelpiano body (zwart)
+//   F = vleugelpiano toetsen (front)
 
 const MAPS = {
   parkeerplaats: {
     width: 25,
     height: 19,
     floorTile: 'tile_floor_path',
-    encounterRate: 0.06,
+    encounterRate: 0.15,
     encounterMons: ['pocketon'],
-    encounterLevels: [3, 5],
+    encounterLevels: [4, 6],
     tiles: [
       '#########################',
       '#.......................#',
@@ -60,9 +62,9 @@ const MAPS = {
     width: 25,
     height: 19,
     floorTile: 'tile_floor_outside',
-    encounterRate: 0.08,
+    encounterRate: 0.18,
     encounterMons: ['pocketon', 'orderon'],
-    encounterLevels: [3, 6],
+    encounterLevels: [4, 7],
     tiles: [
       '#########################',
       '#.......T...............#',
@@ -72,13 +74,13 @@ const MAPS = {
       '#.......................#',
       '#.........A.............#',
       '#.......................#',
-      '#..PP.............PP....#',
-      '#..PP...WWWWW.....PP....#',
-      '#.......WWWWW...........#',
-      '#.......WWWWW...........#',
+      '#..PP..EEEEEEEEE.PP....#',
+      '#..PP..EEEEEEEEE.PP....#',
+      '#......EEEEEEEEE........#',
+      '#......EEEEEEEEE........#',
       '#.......................#',
-      '#..PP...........PP......#',
-      '#..PP...........PP......#',
+      '#..PP.EEEEEEEE.PP......#',
+      '#..PP.EEEEEEEE.PP......#',
       '#.......................#',
       '#...........T...........#',
       '#.......................#',
@@ -162,9 +164,9 @@ const MAPS = {
     width: 25,
     height: 19,
     floorTile: 'tile_floor_office',
-    encounterRate: 0.10,
+    encounterRate: 0.20,
     encounterMons: ['pocketon', 'projecto'],
-    encounterLevels: [5, 8],
+    encounterLevels: [5, 9],
     tiles: [
       '#########################',
       '#...KCKCKCKCKCKCKCKCKE..#',
@@ -217,7 +219,7 @@ const MAPS = {
           { speaker: 'Cas', text: 'Ik werk aan de nieuwste features. Maar eerst... een battle!' },
         ],
         isTrainer: true,
-        team: [{ species: 'pocketon', level: 7 }, { species: 'projecto', level: 6 }],
+        team: [{ species: 'pocketon', level: 7 }, { species: 'projecto', level: 7 }],
         defeatDialog: [
           { speaker: 'Cas', text: 'Prima gedaan! De overlegruimtes verderop zijn nu open voor je.' },
         ],
@@ -241,9 +243,9 @@ const MAPS = {
     width: 25,
     height: 19,
     floorTile: 'tile_floor_office',
-    encounterRate: 0.08,
+    encounterRate: 0.18,
     encounterMons: ['projecto', 'relatiox'],
-    encounterLevels: [7, 10],
+    encounterLevels: [7, 11],
     tiles: [
       '#########################',
       '#.....#.....#.....#.....#',
@@ -281,7 +283,7 @@ const MAPS = {
           { speaker: 'Sophie', text: 'In een overleg moet je strategisch denken. Net als in een AFASmon-battle!' },
         ],
         isTrainer: true,
-        team: [{ species: 'projecto', level: 9 }, { species: 'relatiox', level: 8 }],
+        team: [{ species: 'projecto', level: 8 }, { species: 'relatiox', level: 8 }],
         defeatDialog: [
           { speaker: 'Sophie', text: 'Goed plan! De sportruimtes zijn nu ook bereikbaar.' },
         ],
@@ -297,7 +299,7 @@ const MAPS = {
           { speaker: 'Bertine', text: 'Bij support lossen we elk probleem op. Jouw AFASmon ook?' },
         ],
         isTrainer: true,
-        team: [{ species: 'salarion', level: 10 }, { species: 'projecto', level: 9 }],
+        team: [{ species: 'salarion', level: 9 }, { species: 'projecto', level: 9 }],
         defeatDialog: [
           { speaker: 'Bertine', text: 'Netjes opgelost! Ga je eens melden bij de collegezalen.' },
         ],
@@ -321,9 +323,9 @@ const MAPS = {
     width: 25,
     height: 19,
     floorTile: 'tile_floor_atrium',
-    encounterRate: 0.10,
+    encounterRate: 0.20,
     encounterMons: ['profitron', 'salarion'],
-    encounterLevels: [8, 12],
+    encounterLevels: [8, 13],
     tiles: [
       '#########################',
       '#...........T...........#',
@@ -362,9 +364,9 @@ const MAPS = {
         ],
         isTrainer: true,
         team: [
-          { species: 'profitron', level: 11 },
-          { species: 'salarion', level: 11 },
-          { species: 'orderon', level: 10 },
+          { species: 'profitron', level: 10 },
+          { species: 'salarion', level: 10 },
+          { species: 'orderon', level: 9 },
         ],
         defeatDialog: [
           { speaker: 'Herman', text: 'Uitstekend! Je hebt de theorie goed begrepen. Het theater is nu bereikbaar!' },
@@ -382,8 +384,8 @@ const MAPS = {
         ],
         isTrainer: true,
         team: [
-          { species: 'relatiox', level: 12 },
-          { species: 'workflox', level: 11 },
+          { species: 'relatiox', level: 10 },
+          { species: 'workflox', level: 10 },
         ],
         defeatDialog: [
           { speaker: 'Manouk', text: 'Knap gedaan! Je bent klaar voor het echte werk.' },
@@ -397,28 +399,28 @@ const MAPS = {
     width: 25,
     height: 19,
     floorTile: 'tile_floor_restaurant',
-    encounterRate: 0.05,
+    encounterRate: 0.15,
     encounterMons: ['salarion'],
-    encounterLevels: [5, 8],
+    encounterLevels: [5, 9],
     tiles: [
       '#########################',
-      '#.....................H.#',
-      '#..RRRRRR...............#',
-      '#..RRRRRR.....KCKCKCKE..#',
-      '#.....................E.#',
-      '#.............KCKCKCKE..#',
+      '#..RRRRRR.........H.PP.#',
+      '#..RRRRRR..............#',
+      '#..N.......KC..KC......#',
+      '#..........KC..KC......#',
       '#.......................#',
-      '#....N..........KCKCKE..#',
-      'T.......................#',
-      '#.............KCKCKCKE..#',
-      '#.....................E.#',
-      '#.............KCKCKCKE..#',
+      '#..KC..KC....VV..KC.KC.#',
+      '#..KC..KC...VVV..KC.KC.#',
+      'T...........FFF........#',
+      '#..KC..KC....N...KC.KC.#',
+      '#..KC..KC........KC.KC.#',
       '#.......................#',
-      '#.....................E.#',
-      '#..PPPP.........KCKCKE..#',
-      '#..PPPP.................#',
-      '#..PPPP....N............#',
+      '#..........KC..KC......#',
+      '#..........KC..KC......#',
+      '#..EEE..............EE.#',
+      '#..EEE.........N....EE.#',
       '#.......................#',
+      '#..PP...............PP.#',
       '#########################',
     ],
     transitions: [
@@ -427,23 +429,36 @@ const MAPS = {
     npcs: [
       {
         id: 'chef',
-        sprite: 'npc_support',
-        x: 5,
-        y: 7,
-        name: 'Chef-kok',
+        sprite: 'npc_chef',
+        x: 3,
+        y: 3,
+        name: 'Chef-kok Thijmen',
         dialog: [
-          { speaker: 'Chef-kok', text: 'Welkom in het restaurant! Hier kun je je team volledig laten herstellen.' },
-          { speaker: 'Chef-kok', text: 'Geniet van een maaltijd — op kosten van AFAS natuurlijk!' },
+          { speaker: 'Thijmen', text: 'Welkom in het restaurant! Ik ben Thijmen, de chef-kok.' },
+          { speaker: 'Thijmen', text: 'Hier kun je je team volledig laten herstellen met een heerlijke maaltijd — op kosten van AFAS!' },
           { speaker: 'Systeem', text: 'Je hele team is volledig hersteld!' },
         ],
         heals: true,
         isTrainer: false,
       },
       {
+        id: 'jan_vayne',
+        sprite: 'npc_jan_vayne',
+        x: 13,
+        y: 9,
+        name: 'Jan Vayne',
+        dialog: [
+          { speaker: 'Jan Vayne', text: 'Welkom... Ik ben Jan Vayne, pianist hier in het AFAS restaurant.' },
+          { speaker: 'Jan Vayne', text: 'Muziek brengt mensen samen. Net als goede software, toch?' },
+          { speaker: 'Jan Vayne', text: 'Luister maar even mee... *speelt een prachtige melodie op de vleugel*' },
+        ],
+        isTrainer: false,
+      },
+      {
         id: 'restaurant_npc',
         sprite: 'npc_marketing',
-        x: 11,
-        y: 16,
+        x: 15,
+        y: 15,
         name: 'Collega Britt',
         dialog: [
           { speaker: 'Britt', text: 'Wist je dat AFAS een van de duurzaamste kantoren van Nederland heeft?' },
@@ -458,9 +473,9 @@ const MAPS = {
     width: 25,
     height: 19,
     floorTile: 'tile_floor_sport',
-    encounterRate: 0.12,
+    encounterRate: 0.22,
     encounterMons: ['orderon', 'pocketon'],
-    encounterLevels: [8, 12],
+    encounterLevels: [9, 13],
     tiles: [
       '#########################',
       '#EEEEEEEEEEEEEEEEEEEEE..#',
@@ -497,8 +512,8 @@ const MAPS = {
         ],
         isTrainer: true,
         team: [
-          { species: 'orderon', level: 12 },
-          { species: 'pocketon', level: 13 },
+          { species: 'orderon', level: 10 },
+          { species: 'pocketon', level: 11 },
         ],
         defeatDialog: [
           { speaker: 'Lars', text: 'Sterk! Je AFASmon zijn in topvorm.' },
@@ -524,9 +539,9 @@ const MAPS = {
     width: 25,
     height: 19,
     floorTile: 'tile_floor_office',
-    encounterRate: 0.08,
+    encounterRate: 0.18,
     encounterMons: ['relatiox', 'workflox'],
-    encounterLevels: [8, 12],
+    encounterLevels: [9, 13],
     tiles: [
       '#########################',
       '#..KK...#..KK...#..KK...#',
@@ -563,8 +578,8 @@ const MAPS = {
         ],
         isTrainer: true,
         team: [
-          { species: 'relatiox', level: 11 },
-          { species: 'pocketon', level: 12 },
+          { species: 'relatiox', level: 10 },
+          { species: 'pocketon', level: 10 },
         ],
         defeatDialog: [
           { speaker: 'Martijn', text: 'Dat was... content-waardig! Goed gedaan.' },
@@ -589,9 +604,9 @@ const MAPS = {
     width: 25,
     height: 19,
     floorTile: 'tile_floor_theater',
-    encounterRate: 0.08,
+    encounterRate: 0.20,
     encounterMons: ['workflox', 'profitron'],
-    encounterLevels: [10, 14],
+    encounterLevels: [11, 15],
     tiles: [
       '#########################',
       '#...........T...........#',
@@ -630,9 +645,9 @@ const MAPS = {
         ],
         isTrainer: true,
         team: [
-          { species: 'workflox', level: 14 },
-          { species: 'profitron', level: 13 },
-          { species: 'salarion', level: 14 },
+          { species: 'workflox', level: 12 },
+          { species: 'profitron', level: 12 },
+          { species: 'salarion', level: 13 },
         ],
         defeatDialog: [
           { speaker: 'Mohamed', text: 'Bravo! Standing ovation! Je bent klaar voor de directiekamer.' },
@@ -646,9 +661,9 @@ const MAPS = {
     width: 25,
     height: 19,
     floorTile: 'tile_floor_garage',
-    encounterRate: 0.15,
+    encounterRate: 0.25,
     encounterMons: ['workflox', 'orderon', 'pocketon'],
-    encounterLevels: [10, 15],
+    encounterLevels: [11, 16],
     tiles: [
       '#########################',
       '#...........T...........#',
@@ -680,9 +695,9 @@ const MAPS = {
     width: 25,
     height: 19,
     floorTile: 'tile_floor_path',
-    encounterRate: 0.12,
+    encounterRate: 0.22,
     encounterMons: ['profitron', 'relatiox', 'workflox'],
-    encounterLevels: [12, 16],
+    encounterLevels: [13, 17],
     tiles: [
       '#########################',
       '#SSSSSSSSSSSSSSSSSSSSSE.#',
@@ -757,10 +772,10 @@ const MAPS = {
         isTrainer: true,
         isBoss: true,
         team: [
-          { species: 'profitron', level: 18 },
-          { species: 'workflox', level: 18 },
-          { species: 'salarion', level: 19 },
-          { species: 'innovaxx', level: 20 },
+          { species: 'profitron', level: 15 },
+          { species: 'workflox', level: 15 },
+          { species: 'salarion', level: 16 },
+          { species: 'innovaxx', level: 18 },
         ],
         defeatDialog: [
           { speaker: 'Bas', text: 'Ongelooflijk! Je hebt het gedaan!' },
@@ -811,6 +826,8 @@ export function parseMap(mapData) {
         case 'L': tileKey = 'tile_laadpaal'; isWalkable = false; break;
         case 'S': tileKey = 'tile_solar_panel'; isWalkable = false; break;
         case 'X': tileKey = 'tile_car'; isWalkable = false; break;
+        case 'V': tileKey = 'tile_piano'; isWalkable = false; break;
+        case 'F': tileKey = 'tile_piano_keys'; isWalkable = false; break;
         case 'D': tileKey = mapData.floorTile; isWalkable = true; break;
         case 'N': tileKey = mapData.floorTile; isWalkable = true; break;
         case 'H': tileKey = mapData.floorTile; isWalkable = true; break;

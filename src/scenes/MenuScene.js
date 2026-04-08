@@ -7,119 +7,177 @@ export class MenuScene extends Phaser.Scene {
   }
 
   create() {
-    // Animated background
-    this.cameras.main.setBackgroundColor('#0a0a2e');
+    // AFAS-style clean white background
+    this.cameras.main.setBackgroundColor('#FFFFFF');
 
-    // Floating particles
+    // Top blue accent bar (AFAS header style)
+    this.add.rectangle(GAME_WIDTH / 2, 0, GAME_WIDTH, 6, 0x00529C).setOrigin(0.5, 0);
+
+    // Subtle geometric decoration (AFAS uses clean geometric shapes)
+    const deco = this.add.graphics();
+    deco.fillStyle(0x00529C, 0.04);
+    deco.fillCircle(680, 80, 200);
+    deco.fillCircle(120, 500, 150);
+    deco.fillStyle(0xF57C00, 0.03);
+    deco.fillCircle(650, 480, 120);
+
+    // Floating soft particles (subtle, AFAS-clean)
     this.particles = [];
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 20; i++) {
       const p = this.add.circle(
         Phaser.Math.Between(0, GAME_WIDTH),
         Phaser.Math.Between(0, GAME_HEIGHT),
-        Phaser.Math.Between(1, 3),
-        COLORS.PRIMARY,
-        0.3
+        Phaser.Math.Between(2, 5),
+        Phaser.Math.Between(0, 1) ? 0x00529C : 0xF57C00,
+        0.08
       );
-      p.vx = Phaser.Math.FloatBetween(-0.3, 0.3);
-      p.vy = Phaser.Math.FloatBetween(-0.5, -0.1);
+      p.vx = Phaser.Math.FloatBetween(-0.2, 0.2);
+      p.vy = Phaser.Math.FloatBetween(-0.3, -0.05);
       this.particles.push(p);
     }
 
     // Logo area
-    const logoY = 160;
+    const logoY = 130;
 
-    // AFAS-style background shape
-    this.add.rectangle(GAME_WIDTH / 2, logoY, 500, 100, COLORS.PRIMARY, 0.15)
-      .setStrokeStyle(2, COLORS.PRIMARY, 0.3);
-
-    // Title
-    this.add.text(GAME_WIDTH / 2, logoY - 15, 'AFASmon', {
-      fontFamily: 'Arial Black, Impact, sans-serif',
-      fontSize: '64px',
-      color: '#F57C00',
-      stroke: '#00529C',
-      strokeThickness: 8,
-      shadow: { offsetX: 3, offsetY: 3, color: '#000000', blur: 5, fill: true },
+    // "Succes begint met" tagline above title
+    this.add.text(GAME_WIDTH / 2, logoY - 55, 'Succes begint met', {
+      fontFamily: 'Arial, Helvetica, sans-serif',
+      fontSize: '16px',
+      color: '#78909C',
+      letterSpacing: 3,
     }).setOrigin(0.5);
+
+    // Title — AFAS Blue, clean and bold like afas.nl headings
+    this.add.text(GAME_WIDTH / 2, logoY, 'AFAS', {
+      fontFamily: 'Arial Black, Impact, sans-serif',
+      fontSize: '72px',
+      color: '#00529C',
+    }).setOrigin(0.5);
+
+    // "mon" suffix in orange accent
+    const afasText = this.add.text(GAME_WIDTH / 2, logoY, 'AFAS', {
+      fontFamily: 'Arial Black, Impact, sans-serif',
+      fontSize: '72px',
+      color: '#00529C',
+    }).setOrigin(0.5);
+
+    // Measure "AFAS" width to position "mon" right after it
+    const monX = GAME_WIDTH / 2 + afasText.width / 2;
+    afasText.destroy(); // remove the measuring text
+
+    // Composite title: "AFAS" in blue + "mon" in orange
+    this.add.text(GAME_WIDTH / 2, logoY, 'AFAS', {
+      fontFamily: 'Arial Black, Impact, sans-serif',
+      fontSize: '72px',
+      color: '#00529C',
+    }).setOrigin(0.5);
+
+    this.add.text(monX + 2, logoY + 8, 'mon', {
+      fontFamily: 'Arial, Helvetica, sans-serif',
+      fontSize: '40px',
+      color: '#F57C00',
+      fontStyle: 'bold',
+    }).setOrigin(0, 0.5);
 
     // Subtitle
-    this.add.text(GAME_WIDTH / 2, logoY + 35, 'Vang ze allemaal in het AFAS Clubhuis!', {
-      fontFamily: 'Arial, sans-serif',
-      fontSize: '18px',
-      color: '#B0BEC5',
-    }).setOrigin(0.5);
-
-    // Menu buttons
-    const buttonData = [
-      { text: 'Nieuw Spel', y: 310, action: () => this.startNewGame() },
-      { text: 'Verder Spelen', y: 370, action: () => this.continueGame() },
-    ];
-
-    buttonData.forEach(({ text, y, action }) => {
-      const btnBg = this.add.rectangle(GAME_WIDTH / 2, y, 250, 44, COLORS.PRIMARY, 0.8)
-        .setStrokeStyle(2, COLORS.SECONDARY)
-        .setInteractive({ useHandCursor: true });
-
-      const btnText = this.add.text(GAME_WIDTH / 2, y, text, {
-        fontFamily: 'Arial, sans-serif',
-        fontSize: '20px',
-        color: '#ffffff',
-        fontStyle: 'bold',
-      }).setOrigin(0.5);
-
-      btnBg.on('pointerover', () => {
-        btnBg.setFillStyle(COLORS.SECONDARY, 0.9);
-        btnText.setScale(1.05);
-      });
-      btnBg.on('pointerout', () => {
-        btnBg.setFillStyle(COLORS.PRIMARY, 0.8);
-        btnText.setScale(1);
-      });
-      btnBg.on('pointerdown', action);
-    });
-
-    // Check for existing save
-    const hasSave = !!localStorage.getItem('afasmon_save');
-    if (!hasSave) {
-      buttonData[1] && (() => {
-        // Dim the "Verder Spelen" button if no save
-        const dimRect = this.add.rectangle(GAME_WIDTH / 2, 370, 250, 44, 0x000000, 0.5);
-      })();
-    }
-
-    // Footer
-    this.add.text(GAME_WIDTH / 2, 530, '© 2026 - AFAS Clubhuis Leusden', {
-      fontFamily: 'Arial, sans-serif',
-      fontSize: '12px',
+    this.add.text(GAME_WIDTH / 2, logoY + 48, 'Vang ze allemaal in het AFAS Clubhuis!', {
+      fontFamily: 'Arial, Helvetica, sans-serif',
+      fontSize: '17px',
       color: '#455A64',
     }).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 550, 'Druk op ENTER of klik om te starten', {
-      fontFamily: 'Arial, sans-serif',
-      fontSize: '14px',
-      color: '#78909C',
-    }).setOrigin(0.5);
+    // Thin orange accent line under subtitle
+    this.add.rectangle(GAME_WIDTH / 2, logoY + 72, 280, 3, 0xF57C00).setOrigin(0.5);
 
-    // Show random AFASmon sprites floating around
+    // Menu buttons — AFAS style: solid color, rounded feel, clean typography
+    const buttonY = 270;
+    const buttonSpacing = 60;
+
+    const buttonData = [
+      { text: 'Nieuw Spel', y: buttonY, action: () => this.startNewGame(), primary: true },
+      { text: 'Verder Spelen', y: buttonY + buttonSpacing, action: () => this.continueGame(), primary: false },
+    ];
+
+    const hasSave = !!localStorage.getItem('afasmon_save');
+
+    buttonData.forEach(({ text, y, action, primary }) => {
+      const isDisabled = text === 'Verder Spelen' && !hasSave;
+      const bgColor = isDisabled ? 0xCFD8DC : primary ? 0x00529C : 0xFFFFFF;
+      const borderColor = isDisabled ? 0xB0BEC5 : 0x00529C;
+      const textColor = isDisabled ? '#90A4AE' : primary ? '#ffffff' : '#00529C';
+
+      const btnBg = this.add.rectangle(GAME_WIDTH / 2, y, 280, 48, bgColor)
+        .setStrokeStyle(2, borderColor);
+
+      const btnText = this.add.text(GAME_WIDTH / 2, y, text, {
+        fontFamily: 'Arial, Helvetica, sans-serif',
+        fontSize: '18px',
+        color: textColor,
+        fontStyle: 'bold',
+      }).setOrigin(0.5);
+
+      if (!isDisabled) {
+        btnBg.setInteractive({ useHandCursor: true });
+
+        btnBg.on('pointerover', () => {
+          if (primary) {
+            btnBg.setFillStyle(0xF57C00);
+          } else {
+            btnBg.setFillStyle(0x00529C);
+            btnText.setColor('#ffffff');
+          }
+        });
+        btnBg.on('pointerout', () => {
+          btnBg.setFillStyle(bgColor);
+          btnText.setColor(textColor);
+        });
+        btnBg.on('pointerdown', action);
+      }
+    });
+
+    // Show AFASmon sprites in a neat row
     const monsterKeys = ['profitron', 'salarion', 'relatiox', 'orderon', 'workflox', 'projecto', 'pocketon', 'innovaxx'];
     this.floatingMonsters = [];
-    for (let i = 0; i < 4; i++) {
-      const key = monsterKeys[Phaser.Math.Between(0, monsterKeys.length - 1)];
-      const sprite = this.add.image(
-        Phaser.Math.Between(50, GAME_WIDTH - 50),
-        Phaser.Math.Between(420, 510),
-        `${key}_battle`
-      ).setAlpha(0.3).setScale(0.6);
+    const rowY = 430;
+    const startX = GAME_WIDTH / 2 - (monsterKeys.length - 1) * 45;
+
+    monsterKeys.forEach((key, i) => {
+      const x = startX + i * 90;
+      const sprite = this.add.image(x, rowY, `${key}_battle`).setScale(0.55).setAlpha(0.6);
       this.tweens.add({
         targets: sprite,
-        y: sprite.y - 15,
-        duration: 2000 + i * 500,
+        y: rowY - 8,
+        duration: 1800 + i * 200,
         yoyo: true,
         repeat: -1,
         ease: 'Sine.easeInOut',
       });
       this.floatingMonsters.push(sprite);
-    }
+    });
+
+    // Stats line (AFAS-style "feiten & cijfers")
+    const statsY = 495;
+    this.add.text(GAME_WIDTH / 2, statsY, '8 AFASmon  •  13 zones  •  28 aanvallen  •  1 Clubhuis', {
+      fontFamily: 'Arial, Helvetica, sans-serif',
+      fontSize: '12px',
+      color: '#90A4AE',
+    }).setOrigin(0.5);
+
+    // Footer
+    this.add.text(GAME_WIDTH / 2, 540, '© 2026 AFAS Software — Leusden, Nederland', {
+      fontFamily: 'Arial, Helvetica, sans-serif',
+      fontSize: '11px',
+      color: '#B0BEC5',
+    }).setOrigin(0.5);
+
+    this.add.text(GAME_WIDTH / 2, 560, 'Druk op ENTER of klik om te starten', {
+      fontFamily: 'Arial, Helvetica, sans-serif',
+      fontSize: '13px',
+      color: '#00529C',
+    }).setOrigin(0.5);
+
+    // Bottom orange accent bar
+    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT, GAME_WIDTH, 4, 0xF57C00).setOrigin(0.5, 1);
 
     // Keyboard
     this.input.keyboard.on('keydown-ENTER', () => {

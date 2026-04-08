@@ -197,6 +197,7 @@ export class BattleScene extends Phaser.Scene {
 
   createActionMenu() {
     this.actionContainer.removeAll(true);
+    this.clearMenuKeys();
 
     // Background
     const bg = this.add.rectangle(0, 0, GAME_WIDTH, 160, 0x0a0a2e, 0.95)
@@ -255,6 +256,7 @@ export class BattleScene extends Phaser.Scene {
 
   showMoveMenu() {
     this.actionContainer.removeAll(true);
+    this.clearMenuKeys();
 
     const bg = this.add.rectangle(0, 0, GAME_WIDTH, 160, 0x0a0a2e, 0.95)
       .setOrigin(0, 0).setStrokeStyle(2, COLORS.PRIMARY);
@@ -314,6 +316,7 @@ export class BattleScene extends Phaser.Scene {
 
   showSwitchMenu() {
     this.actionContainer.removeAll(true);
+    this.clearMenuKeys();
 
     const bg = this.add.rectangle(0, 0, GAME_WIDTH, 160, 0x0a0a2e, 0.95)
       .setOrigin(0, 0).setStrokeStyle(2, COLORS.PRIMARY);
@@ -382,6 +385,11 @@ export class BattleScene extends Phaser.Scene {
 
   showMessage(text, callback) {
     this.messageBox.removeAll(true);
+    this.clearMenuKeys();
+
+    // Block input briefly to prevent rapid-fire advances
+    this.messageReady = false;
+    this.time.delayedCall(350, () => { this.messageReady = true; });
 
     const bg = this.add.rectangle(0, 440, GAME_WIDTH, 160, 0x0a0a2e, 0.95)
       .setOrigin(0, 0).setStrokeStyle(2, COLORS.PRIMARY);
@@ -400,6 +408,7 @@ export class BattleScene extends Phaser.Scene {
     this.messageBox.add(cont);
 
     const advance = () => {
+      if (!this.messageReady) return;
       this.input.off('pointerdown', advance);
       this.input.keyboard.off('keydown-SPACE', advance);
       this.input.keyboard.off('keydown-ENTER', advance);
@@ -423,9 +432,10 @@ export class BattleScene extends Phaser.Scene {
   }
 
   executePlayerMove(move) {
+    if (this.state !== STATES.PLAYER_TURN) return;
     this.state = STATES.ANIMATING;
-    this.input.keyboard.removeAllKeys(true);
-    this.setupKeys();
+    this.clearMenuKeys();
+    this.actionContainer.removeAll(true);
 
     const turnOrder = this.battleSystem.determineTurnOrder(this.playerMon, this.enemyMon);
 
@@ -474,12 +484,20 @@ export class BattleScene extends Phaser.Scene {
   }
 
   animateAttack(attacker, results, callback) {
-    const messages = results.map(r => r.text).filter(Boolean);
+    // Add attacker label to the first message for clarity
+    const isPlayer = attacker === 'player';
+    const label = isPlayer ? '🔵 JIJ: ' : '🔴 VIJAND: ';
+    const messages = results.map((r, i) => {
+      if (!r.text) return null;
+      // Prefix the first message (the attack announcement) with the attacker label
+      if (i === 0) return label + r.text;
+      return r.text;
+    }).filter(Boolean);
 
     // Shake animation on damaged sprite
     const hasDamage = results.some(r => r.type === 'damage');
     if (hasDamage) {
-      const targetSprite = attacker === 'player' ? this.enemySprite : this.playerSprite;
+      const targetSprite = isPlayer ? this.enemySprite : this.playerSprite;
       this.tweens.add({
         targets: targetSprite,
         x: targetSprite.x + 10,
@@ -495,10 +513,19 @@ export class BattleScene extends Phaser.Scene {
       });
     }
 
-    // Update HP bars
+    // Only update the HP bar of the target that was affected
     this.time.delayedCall(300, () => {
-      this.updateInfoBox('player');
-      this.updateInfoBox('enemy');
+      if (isPlayer) {
+        this.updateInfoBox('enemy');
+        if (results.some(r => r.type === 'recoil' || r.type === 'heal')) {
+          this.updateInfoBox('player');
+        }
+      } else {
+        this.updateInfoBox('player');
+        if (results.some(r => r.type === 'recoil' || r.type === 'heal')) {
+          this.updateInfoBox('enemy');
+        }
+      }
     });
 
     this.showMessages(messages, callback);
@@ -650,6 +677,7 @@ export class BattleScene extends Phaser.Scene {
 
   showSwitchAfterFaint() {
     this.actionContainer.removeAll(true);
+    this.clearMenuKeys();
 
     const bg = this.add.rectangle(0, 0, GAME_WIDTH, 160, 0x0a0a2e, 0.95)
       .setOrigin(0, 0).setStrokeStyle(2, COLORS.PRIMARY);
@@ -856,6 +884,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   returnToWorld() {
+    this.clearMenuKeys();
     // Save before returning
     const saveData = this.inventory.serialize();
     localStorage.setItem('afasmon_save', JSON.stringify(saveData));
@@ -870,5 +899,12 @@ export class BattleScene extends Phaser.Scene {
 
   setupKeys() {
     this.cursors = this.input.keyboard.createCursorKeys();
+  }
+
+  clearMenuKeys() {
+    // Remove all pending once-listeners for menu keys to prevent ghost inputs
+    ['1', '2', '3', '4', '5', 'ESC'].forEach(key => {
+      this.input.keyboard.off(`keydown-${key}`);
+    });
   }
 }

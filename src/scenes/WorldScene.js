@@ -82,15 +82,15 @@ export class WorldScene extends Phaser.Scene {
       });
     }
 
-    // Menu key
-    this.menuKey.on('down', () => {
-      if (!this.dialogSystem.isActive) {
+    // Menu key (M)
+    this.input.keyboard.on('keydown-M', () => {
+      if (!this.dialogSystem.isActive && !this.teamMenu) {
         this.showTeamMenu();
       }
     });
 
-    // Interact key
-    this.interactKey.on('down', () => {
+    // Interact key (E)
+    this.input.keyboard.on('keydown-E', () => {
       if (!this.dialogSystem.isActive) {
         this.checkInteraction();
       }
