@@ -68,6 +68,15 @@ export class WorldScene extends Phaser.Scene {
       padding: { x: 12, y: 4 },
     }).setOrigin(0.5).setDepth(500).setScrollFactor(0);
 
+    // Quest display (below zone label)
+    this.questLabel = this.add.text(GAME_WIDTH / 2, 42, '', {
+      fontFamily: 'Arial, sans-serif',
+      fontSize: '12px',
+      color: '#FFE0B2',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      padding: { x: 10, y: 3 },
+    }).setOrigin(0.5).setDepth(500).setScrollFactor(0);
+
     // Mini HUD
     this.hudContainer = this.add.container(10, GAME_HEIGHT - 50).setDepth(500).setScrollFactor(0);
 
@@ -82,11 +91,14 @@ export class WorldScene extends Phaser.Scene {
       this.time.delayedCall(500, () => {
         this.dialogSystem.show([
           { speaker: 'Verteller', text: 'Je arriveert op de parkeerplaats van het AFAS Clubhuis in Leusden...' },
-          { speaker: 'Verteller', text: 'Het imposante kunstwerk "You are the World" van Lorenzo Quinn verwelkomt je.' },
+          { speaker: 'Verteller', text: 'Het imposante kunstwerk "You are the World" van Lorenzo Quinn verwelkomt je. Indrukwekkend!' },
           { speaker: 'Verteller', text: 'Dit is je eerste dag als stagiair bij AFAS Software, {name}. Maar iets voelt... anders.' },
-          { speaker: 'Verteller', text: 'Gebruik de pijltjestoetsen of WASD om te bewegen. Druk op E om te interacten.' },
+          { speaker: 'Verteller', text: 'Overal in het gebouw lopen vreemde digitale wezens rond. Softwaremodules... die leven?!' },
+          { speaker: 'Verteller', text: 'Loop naar het zuiden, het Atrium in, en praat met Lisa bij de receptie. Zij weet vast meer!' },
+          { speaker: 'Verteller', text: 'Gebruik pijltjestoetsen of WASD om te bewegen. Druk op E om te praten. M opent je team.' },
         ], () => {
           this.inventory.setFlag('intro_done');
+          this.updateQuestLabel();
         });
       });
     }
@@ -165,15 +177,39 @@ export class WorldScene extends Phaser.Scene {
       }
     }
 
-    // Render transition indicators
+    // Render transition indicators with destination labels
+    const doorZoneNames = {
+      parkeerplaats: 'Parkeerplaats',
+      atrium: 'Atrium',
+      kantoor: 'Kantoor',
+      overlegruimtes: 'Overlegruimtes',
+      collegezalen: 'Collegezalen',
+      restaurant: 'Restaurant',
+      sportruimtes: 'Sportruimtes',
+      studios: "Mediastudio's",
+      theater: 'Theater',
+      parkeergarage: 'Parkeergarage',
+      dakterras: 'Dakterras',
+      directiekamer: 'Directiekamer',
+    };
     this.parsedMap.transitionPoints.forEach(tp => {
-      const arrow = this.add.text(
-        tp.x * TILE_SIZE + TILE_SIZE / 2,
-        tp.y * TILE_SIZE + TILE_SIZE / 2,
-        '🚪',
-        { fontSize: '20px' }
-      ).setOrigin(0.5);
+      const tx = tp.x * TILE_SIZE + TILE_SIZE / 2;
+      const ty = tp.y * TILE_SIZE + TILE_SIZE / 2;
+      const arrow = this.add.text(tx, ty, '🚪', { fontSize: '20px' }).setOrigin(0.5);
       this.tileContainer.add(arrow);
+
+      const destName = doorZoneNames[tp.target] || tp.target;
+      const locked = !this.inventory.isZoneUnlocked(tp.target);
+      const labelText = locked ? `🔒 ${destName}` : `→ ${destName}`;
+      const labelColor = locked ? '#EF9A9A' : '#ffffff';
+      const label = this.add.text(tx, ty - 20, labelText, {
+        fontFamily: 'Arial, sans-serif',
+        fontSize: '10px',
+        color: labelColor,
+        backgroundColor: '#00529C',
+        padding: { x: 4, y: 2 },
+      }).setOrigin(0.5).setDepth(102);
+      this.tileContainer.add(label);
     });
 
     // Place player
@@ -262,6 +298,14 @@ export class WorldScene extends Phaser.Scene {
       yoyo: true,
       onComplete: () => { if (this.zoneLabel) this.zoneLabel.setAlpha(1); },
     });
+
+    // Update quest label
+    this.updateQuestLabel();
+  }
+
+  updateQuestLabel() {
+    const quest = this.inventory.getCurrentQuest();
+    this.questLabel.setText(`📋 ${quest.title}: ${quest.desc}`);
   }
 
   findWalkable(x, y) {
@@ -384,6 +428,18 @@ export class WorldScene extends Phaser.Scene {
   }
 
   interactWithNPC(npc) {
+    // Infobalie — dynamic quest-based dialog
+    if (npc.isInfobalie) {
+      const quest = this.inventory.getCurrentQuest();
+      const hints = [
+        { speaker: 'Infobalie', text: `Welkom bij de infobalie, {name}! Kan ik je ergens mee helpen?` },
+        { speaker: 'Infobalie', text: `Je huidige missie: "${quest.title}"` },
+        { speaker: 'Infobalie', text: quest.desc },
+      ];
+      this.dialogSystem.show(hints);
+      return;
+    }
+
     if (npc.givesStarter && !this.inventory.getFlag('got_starter')) {
       // Starter selection
       this.dialogSystem.show(npc.dialog, () => {
@@ -495,11 +551,13 @@ export class WorldScene extends Phaser.Scene {
 
         this.dialogSystem.show([
           { speaker: 'Lisa', text: `Goede keuze, {name}! ${starter.name} zal je goed van pas komen.` },
-          { speaker: 'Lisa', text: 'Verken het Clubhuis, vang meer AFASmon, en versla de trainers!' },
-          { speaker: 'Lisa', text: 'Het Atrium is de centrale hub. Van daaruit bereik je alle gebieden.' },
-          { speaker: 'Lisa', text: 'Druk op M om je team te bekijken. Veel succes, {name}!' },
+          { speaker: 'Lisa', text: 'Ga nu naar de Kantoorvleugel — dat is links vanuit het Atrium. Daar zitten twee developers die je willen uitdagen!' },
+          { speaker: 'Lisa', text: 'Versla trainers om nieuwe gebieden te ontgrendelen. Bij de deuren staat waar ze naartoe leiden.' },
+          { speaker: 'Lisa', text: 'In het Restaurant rechts kun je altijd gratis herstellen. En vergeet de koffie-automaat hier niet!' },
+          { speaker: 'Lisa', text: 'Druk op M om je team te bekijken. Veel succes, {name}! En pas op voor Relatiox — die healers zijn vervelend.' },
         ], () => {
           this.updateHUD();
+          this.updateQuestLabel();
           this.saveGame();
         });
       });
@@ -634,6 +692,7 @@ export class WorldScene extends Phaser.Scene {
 
   updateHUD() {
     this.hudContainer.removeAll(true);
+    if (this.questLabel) this.updateQuestLabel();
 
     if (this.inventory.team.length === 0) return;
 

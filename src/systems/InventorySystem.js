@@ -85,6 +85,19 @@ export class InventorySystem {
     return this.storyFlags[flag] || false;
   }
 
+  getCurrentQuest() {
+    if (!this.getFlag('intro_done')) return { title: 'Welkom bij AFAS', desc: 'Loop naar het Atrium en praat met Lisa bij de receptie.' };
+    if (!this.getFlag('got_starter')) return { title: 'Kies je AFASmon', desc: 'Praat met Lisa om je eerste AFASmon te kiezen.' };
+    if (!this.isTrainerDefeated('junior_dev_1')) return { title: 'Eerste uitdaging', desc: 'Versla Tim in de Kantoorvleugel. (Links vanuit het Atrium)' };
+    if (!this.isTrainerDefeated('junior_dev_2')) return { title: 'Bewijs jezelf', desc: 'Versla Cas in de Kantoorvleugel.' };
+    if (!this.isTrainerDefeated('trainer_consultant')) return { title: 'Overleg!', desc: 'Versla Sophie in de Overlegruimtes. (Rechts van het Kantoor)' };
+    if (!this.isTrainerDefeated('trainer_support')) return { title: 'Support nodig?', desc: 'Versla Bertine in de Overlegruimtes.' };
+    if (!this.isTrainerDefeated('trainer_opleiding')) return { title: 'Terug naar school', desc: 'Versla Herman in de Collegezalen. (Zuid vanuit het Atrium)' };
+    if (!this.isTrainerDefeated('theater_boss')) return { title: 'Showtime!', desc: 'Versla Mohamed in het AFAS Theater.' };
+    if (!this.isTrainerDefeated('ceo_boss')) return { title: 'De CEO wacht', desc: 'Ga naar de Directiekamer en versla Bas van der Veldt!' };
+    return { title: 'Klaar!', desc: 'Je hebt het Clubhuis veroverd! Verken vrij rond.' };
+  }
+
   serialize() {
     return {
       playerName: this.playerName,

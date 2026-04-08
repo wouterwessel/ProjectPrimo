@@ -176,12 +176,17 @@ export class BattleSystem {
       let score = move.power || 20;
       const eff = this.getTypeEffectiveness(move.type, playerMon.type);
       score *= eff;
-      // Prefer moves with effects when HP is low
-      if (move.effect && move.effect.type === 'heal' && enemyMon.getHpPercent() < 0.4) {
-        score += 50;
+      // Only prefer heal moves when HP is actually low
+      if (move.effect && move.effect.type === 'heal') {
+        if (enemyMon.getHpPercent() < 0.35) {
+          score += 40;
+        } else {
+          // Strongly discourage healing when HP is fine
+          score *= 0.15;
+        }
       }
       // Add some randomness
-      score *= (0.8 + Math.random() * 0.4);
+      score *= (0.7 + Math.random() * 0.6);
       return { move, score };
     });
 

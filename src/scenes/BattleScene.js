@@ -740,6 +740,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   attemptCatch() {
+    if (this.state !== STATES.PLAYER_TURN) return;
     if (!this.inventory.useItem('contract')) {
       this.showMessage('Je hebt geen Contracten meer!', () => {
         this.state = STATES.PLAYER_TURN;
@@ -749,6 +750,8 @@ export class BattleScene extends Phaser.Scene {
     }
 
     this.state = STATES.ANIMATING;
+    this.clearMenuKeys();
+    this.actionContainer.removeAll(true);
 
     const result = this.battleSystem.attemptCatch(this.enemyMon);
 
@@ -792,6 +795,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   useKoffie() {
+    if (this.state !== STATES.PLAYER_TURN) return;
     if (!this.inventory.useItem('koffie')) {
       this.showMessage('Je hebt geen Koffie meer!', () => {
         this.state = STATES.PLAYER_TURN;
@@ -801,6 +805,8 @@ export class BattleScene extends Phaser.Scene {
     }
 
     this.state = STATES.ANIMATING;
+    this.clearMenuKeys();
+    this.actionContainer.removeAll(true);
     const healAmount = Math.floor(this.playerMon.maxHp * 0.4);
     this.playerMon.heal(healAmount);
     this.updateInfoBox('player');
@@ -818,7 +824,10 @@ export class BattleScene extends Phaser.Scene {
   }
 
   attemptFlee() {
+    if (this.state !== STATES.PLAYER_TURN) return;
     this.state = STATES.ANIMATING;
+    this.clearMenuKeys();
+    this.actionContainer.removeAll(true);
     const fleeChance = 0.5 + (this.playerMon.getEffectiveStat('speed') / this.enemyMon.getEffectiveStat('speed')) * 0.3;
 
     if (Math.random() < fleeChance) {
@@ -891,6 +900,7 @@ export class BattleScene extends Phaser.Scene {
 
     this.scene.start(SCENES.WORLD, {
       newGame: false,
+      saveData: saveData,
       currentZone: this.returnZone,
       spawnX: this.returnX,
       spawnY: this.returnY,
@@ -902,9 +912,9 @@ export class BattleScene extends Phaser.Scene {
   }
 
   clearMenuKeys() {
-    // Remove all pending once-listeners for menu keys to prevent ghost inputs
+    // Remove all pending listeners for menu keys to prevent ghost inputs
     ['1', '2', '3', '4', '5', 'ESC'].forEach(key => {
-      this.input.keyboard.off(`keydown-${key}`);
+      this.input.keyboard.removeAllListeners(`keydown-${key}`);
     });
   }
 }
