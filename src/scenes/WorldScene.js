@@ -294,7 +294,7 @@ export class WorldScene extends Phaser.Scene {
       parkeerplaats: '🅿️ Parkeerplaats',
       buitentuin: '🌿 Buitentuin',
       entreecafe: '☕ Entreecafé',
-      atrium: '🏛️ Atrium & Binnentuin',
+      atrium: '🏛️ Atrium',
       kantoor: '💼 Kantoorvleugel',
       overlegruimtes: '🤝 Overlegruimtes',
       collegezalen: '📚 Collegezalen',

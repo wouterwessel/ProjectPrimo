@@ -69,6 +69,9 @@ export class BootScene extends Phaser.Scene {
 
     // Items
     this.generateItemSprites();
+
+    // Clubhuis silhouette for menu/create screens
+    this.generateClubhuisSilhouette();
   }
 
   generatePlayerSprite() {
@@ -701,5 +704,75 @@ export class BootScene extends Phaser.Scene {
 
   create() {
     this.scene.start(SCENES.MENU);
+  }
+
+  generateClubhuisSilhouette() {
+    const W = 800, H = 280;
+    const g = this.make.graphics({ add: false });
+    const c = 0xFFFFFF;
+    // Ground
+    g.fillStyle(c, 0.08);
+    g.fillRect(0, H - 20, W, 20);
+    // Main building
+    const bx = 140, by = 80, bw = 520, bh = 180;
+    g.fillStyle(c, 0.12);
+    g.fillRect(bx, by, bw, bh);
+    // Roof edge
+    g.fillStyle(c, 0.06);
+    g.fillRect(bx - 10, by - 8, bw + 20, 12);
+    // Glass facade columns
+    g.fillStyle(c, 0.06);
+    for (let i = 0; i < 12; i++) {
+      g.fillRect(bx + 20 + i * 42, by + 15, 30, bh - 30);
+    }
+    // Horizontal lines
+    g.fillStyle(c, 0.03);
+    g.fillRect(bx + 10, by + 70, bw - 20, 2);
+    g.fillRect(bx + 10, by + 130, bw - 20, 2);
+    // Theater dome
+    const dx = 560, dy = by - 5;
+    g.fillStyle(c, 0.14);
+    g.fillRect(dx - 50, dy, 100, 85);
+    g.beginPath();
+    g.arc(dx, dy, 50, Math.PI, 0, false);
+    g.closePath();
+    g.fillPath();
+    g.fillStyle(c, 0.05);
+    g.beginPath();
+    g.arc(dx, dy, 40, Math.PI, 0, false);
+    g.closePath();
+    g.fillPath();
+    // Entrance
+    g.fillStyle(c, 0.08);
+    g.fillRect(340, by + bh - 50, 120, 50);
+    g.fillStyle(c, 0.05);
+    g.fillRect(355, by + bh - 45, 35, 40);
+    g.fillRect(400, by + bh - 45, 35, 40);
+    // Solar panels
+    g.fillStyle(c, 0.04);
+    for (let i = 0; i < 8; i++) {
+      g.fillRect(bx + 30 + i * 55, by - 3, 40, 3);
+    }
+    // Quinn sculpture
+    g.fillStyle(c, 0.10);
+    g.beginPath();
+    g.arc(110, H - 70, 20, 0, Math.PI * 2);
+    g.closePath();
+    g.fillPath();
+    g.fillRect(95, H - 95, 6, 30);
+    g.fillRect(119, H - 95, 6, 30);
+    // Bench
+    g.fillStyle(c, 0.08);
+    g.fillRect(90, H - 40, 40, 20);
+    // Trees
+    g.fillStyle(c, 0.06);
+    g.beginPath(); g.arc(50, H - 45, 18, 0, Math.PI * 2); g.closePath(); g.fillPath();
+    g.fillRect(47, H - 30, 6, 12);
+    g.beginPath(); g.arc(730, H - 40, 15, 0, Math.PI * 2); g.closePath(); g.fillPath();
+    g.fillRect(727, H - 28, 6, 10);
+    g.beginPath(); g.arc(760, H - 50, 20, 0, Math.PI * 2); g.closePath(); g.fillPath();
+    g.fillRect(757, H - 34, 6, 14);
+    g.generateTexture('clubhuis_silhouette', W, H);
+    g.destroy();
   }
 }

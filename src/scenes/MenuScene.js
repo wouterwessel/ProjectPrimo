@@ -7,29 +7,26 @@ export class MenuScene extends Phaser.Scene {
   }
 
   create() {
-    // AFAS-style clean white background
-    this.cameras.main.setBackgroundColor('#FFFFFF');
+    // Dark gradient background
+    this.cameras.main.setBackgroundColor('#0a0a2e');
+    const bg = this.add.graphics();
+    bg.fillGradientStyle(0x0a0a2e, 0x0a0a2e, 0x00396b, 0x00396b);
+    bg.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
-    // Top blue accent bar (AFAS header style)
-    this.add.rectangle(GAME_WIDTH / 2, 0, GAME_WIDTH, 6, 0x00529C).setOrigin(0.5, 0);
+    // Clubhuis silhouette at bottom
+    if (this.textures.exists('clubhuis_silhouette')) {
+      this.add.image(GAME_WIDTH / 2, GAME_HEIGHT - 50, 'clubhuis_silhouette').setAlpha(1).setOrigin(0.5, 1);
+    }
 
-    // Subtle geometric decoration (AFAS uses clean geometric shapes)
-    const deco = this.add.graphics();
-    deco.fillStyle(0x00529C, 0.04);
-    deco.fillCircle(680, 80, 200);
-    deco.fillCircle(120, 500, 150);
-    deco.fillStyle(0xF57C00, 0.03);
-    deco.fillCircle(650, 480, 120);
-
-    // Floating soft particles (subtle, AFAS-clean)
+    // Floating particles
     this.particles = [];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 25; i++) {
       const p = this.add.circle(
         Phaser.Math.Between(0, GAME_WIDTH),
         Phaser.Math.Between(0, GAME_HEIGHT),
-        Phaser.Math.Between(2, 5),
-        Phaser.Math.Between(0, 1) ? 0x00529C : 0xF57C00,
-        0.08
+        Phaser.Math.Between(2, 6),
+        Phaser.Math.Between(0, 1) ? 0x4FC3F7 : 0xFFFFFF,
+        0.12
       );
       p.vx = Phaser.Math.FloatBetween(-0.2, 0.2);
       p.vy = Phaser.Math.FloatBetween(-0.3, -0.05);
@@ -37,105 +34,138 @@ export class MenuScene extends Phaser.Scene {
     }
 
     // Logo area
-    const logoY = 130;
+    const logoY = 120;
 
-    // "Succes begint met" tagline above title
-    this.add.text(GAME_WIDTH / 2, logoY - 55, 'Succes begint met', {
+    // Tagline with typewriter effect
+    const tagline = this.add.text(GAME_WIDTH / 2, logoY - 55, '', {
       fontFamily: 'Arial, Helvetica, sans-serif',
       fontSize: '16px',
-      color: '#78909C',
+      color: '#90CAF9',
       letterSpacing: 3,
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setAlpha(0);
 
-    // Title — AFAS Blue, clean and bold like afas.nl headings
-    this.add.text(GAME_WIDTH / 2, logoY, 'AFAS', {
+    // Measure AFAS width
+    const measure = this.add.text(0, 0, 'AFAS', {
       fontFamily: 'Arial Black, Impact, sans-serif',
       fontSize: '72px',
-      color: '#00529C',
     }).setOrigin(0.5);
+    const monX = GAME_WIDTH / 2 + measure.width / 2;
+    measure.destroy();
 
-    // "mon" suffix in orange accent
-    const afasText = this.add.text(GAME_WIDTH / 2, logoY, 'AFAS', {
+    // Title AFAS in white
+    const titleAfas = this.add.text(GAME_WIDTH / 2, logoY, 'AFAS', {
       fontFamily: 'Arial Black, Impact, sans-serif',
       fontSize: '72px',
-      color: '#00529C',
-    }).setOrigin(0.5);
+      color: '#ffffff',
+    }).setOrigin(0.5).setAlpha(0);
 
-    // Measure "AFAS" width to position "mon" right after it
-    const monX = GAME_WIDTH / 2 + afasText.width / 2;
-    afasText.destroy(); // remove the measuring text
-
-    // Composite title: "AFAS" in blue + "mon" in orange
-    this.add.text(GAME_WIDTH / 2, logoY, 'AFAS', {
-      fontFamily: 'Arial Black, Impact, sans-serif',
-      fontSize: '72px',
-      color: '#00529C',
-    }).setOrigin(0.5);
-
-    this.add.text(monX + 2, logoY + 8, 'mon', {
+    // "mon" in silver/light grey (not orange)
+    const titleMon = this.add.text(monX + 2, logoY + 8, 'mon', {
       fontFamily: 'Arial, Helvetica, sans-serif',
       fontSize: '40px',
-      color: '#F57C00',
+      color: '#B0BEC5',
       fontStyle: 'bold',
-    }).setOrigin(0, 0.5);
+    }).setOrigin(0, 0.5).setAlpha(0);
 
     // Subtitle
-    this.add.text(GAME_WIDTH / 2, logoY + 48, 'Vang ze allemaal in het AFAS Clubhuis!', {
+    const subtitle = this.add.text(GAME_WIDTH / 2, logoY + 48, '', {
       fontFamily: 'Arial, Helvetica, sans-serif',
       fontSize: '17px',
-      color: '#455A64',
+      color: '#B0BEC5',
     }).setOrigin(0.5);
 
-    // Thin orange accent line under subtitle
-    this.add.rectangle(GAME_WIDTH / 2, logoY + 72, 280, 3, 0xF57C00).setOrigin(0.5);
+    // Accent line
+    const accentLine = this.add.rectangle(GAME_WIDTH / 2, logoY + 72, 0, 3, 0xF57C00).setOrigin(0.5);
 
-    // Menu buttons — AFAS style: solid color, rounded feel, clean typography
+    // === Animations ===
+    this.tweens.add({
+      targets: [titleAfas, titleMon],
+      alpha: 1,
+      duration: 800,
+      ease: 'Power2',
+    });
+
+    this.time.delayedCall(400, () => {
+      tagline.setAlpha(1);
+      const fullTag = 'Succes begint met';
+      let idx = 0;
+      this.time.addEvent({
+        delay: 40, repeat: fullTag.length - 1,
+        callback: () => { tagline.setText(fullTag.substring(0, ++idx)); },
+      });
+    });
+
+    this.time.delayedCall(1200, () => {
+      const fullSub = 'Vang ze allemaal in het AFAS Clubhuis!';
+      let idx = 0;
+      this.time.addEvent({
+        delay: 30, repeat: fullSub.length - 1,
+        callback: () => { subtitle.setText(fullSub.substring(0, ++idx)); },
+      });
+    });
+
+    this.time.delayedCall(1000, () => {
+      this.tweens.add({ targets: accentLine, width: 280, duration: 600, ease: 'Power2' });
+    });
+
+    // Menu buttons
     const buttonY = 270;
     const buttonSpacing = 60;
+    const hasSave = !!localStorage.getItem('afasmon_save');
 
     const buttonData = [
       { text: 'Nieuw Spel', y: buttonY, action: () => this.startNewGame(), primary: true },
       { text: 'Verder Spelen', y: buttonY + buttonSpacing, action: () => this.continueGame(), primary: false },
     ];
 
-    const hasSave = !!localStorage.getItem('afasmon_save');
-
     buttonData.forEach(({ text, y, action, primary }) => {
       const isDisabled = text === 'Verder Spelen' && !hasSave;
-      const bgColor = isDisabled ? 0xCFD8DC : primary ? 0x00529C : 0xFFFFFF;
-      const borderColor = isDisabled ? 0xB0BEC5 : 0x00529C;
-      const textColor = isDisabled ? '#90A4AE' : primary ? '#ffffff' : '#00529C';
+      const bgColor = isDisabled ? 0x263238 : primary ? 0xF57C00 : 0x00000000;
+      const borderColor = isDisabled ? 0x37474F : primary ? 0xF57C00 : 0xFFFFFF;
+      const textColor = isDisabled ? '#546E7A' : '#ffffff';
 
       const btnBg = this.add.rectangle(GAME_WIDTH / 2, y, 280, 48, bgColor)
-        .setStrokeStyle(2, borderColor);
+        .setStrokeStyle(2, borderColor).setAlpha(0);
 
       const btnText = this.add.text(GAME_WIDTH / 2, y, text, {
         fontFamily: 'Arial, Helvetica, sans-serif',
         fontSize: '18px',
         color: textColor,
         fontStyle: 'bold',
-      }).setOrigin(0.5);
+      }).setOrigin(0.5).setAlpha(0);
+
+      this.tweens.add({
+        targets: [btnBg, btnText],
+        alpha: 1,
+        duration: 500,
+        delay: 1400 + (primary ? 0 : 150),
+      });
+
+      if (primary && !isDisabled) {
+        this.time.delayedCall(2000, () => {
+          this.tweens.add({
+            targets: btnBg,
+            scaleX: 1.02, scaleY: 1.02,
+            duration: 1200,
+            yoyo: true, repeat: -1,
+            ease: 'Sine.easeInOut',
+          });
+        });
+      }
 
       if (!isDisabled) {
         btnBg.setInteractive({ useHandCursor: true });
-
         btnBg.on('pointerover', () => {
-          if (primary) {
-            btnBg.setFillStyle(0xF57C00);
-          } else {
-            btnBg.setFillStyle(0x00529C);
-            btnText.setColor('#ffffff');
-          }
+          btnBg.setFillStyle(primary ? 0xFF9800 : 0x00529C);
         });
         btnBg.on('pointerout', () => {
           btnBg.setFillStyle(bgColor);
-          btnText.setColor(textColor);
         });
         btnBg.on('pointerdown', action);
       }
     });
 
-    // Show AFASmon sprites in a neat row
+    // AFASmon row
     const monsterKeys = ['profitron', 'salarion', 'relatiox', 'orderon', 'workflox', 'projecto', 'pocketon', 'innovaxx'];
     this.floatingMonsters = [];
     const rowY = 430;
@@ -143,46 +173,37 @@ export class MenuScene extends Phaser.Scene {
 
     monsterKeys.forEach((key, i) => {
       const x = startX + i * 90;
-      const sprite = this.add.image(x, rowY, `${key}_battle`).setScale(0.55).setAlpha(0.6);
+      const sprite = this.add.image(x, rowY, `${key}_battle`).setScale(0.65).setAlpha(0);
+      this.tweens.add({ targets: sprite, alpha: 0.7, duration: 400, delay: 1800 + i * 100 });
       this.tweens.add({
-        targets: sprite,
-        y: rowY - 8,
-        duration: 1800 + i * 200,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
+        targets: sprite, y: rowY - 8,
+        duration: 1800 + i * 200, yoyo: true, repeat: -1,
+        ease: 'Sine.easeInOut', delay: 1800 + i * 100,
       });
       this.floatingMonsters.push(sprite);
     });
 
-    // Stats line (AFAS-style "feiten & cijfers")
-    const statsY = 495;
-    this.add.text(GAME_WIDTH / 2, statsY, '8 AFASmon  •  13 zones  •  28 aanvallen  •  1 Clubhuis', {
-      fontFamily: 'Arial, Helvetica, sans-serif',
-      fontSize: '12px',
-      color: '#90A4AE',
+    // Stats
+    this.add.text(GAME_WIDTH / 2, 495, '8 AFASmon  \u2022  13 zones  \u2022  28 aanvallen  \u2022  1 Clubhuis', {
+      fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '12px', color: '#546E7A',
     }).setOrigin(0.5);
 
-    // Footer
-    this.add.text(GAME_WIDTH / 2, 540, '© 2026 AFAS Software — Leusden, Nederland', {
-      fontFamily: 'Arial, Helvetica, sans-serif',
-      fontSize: '11px',
-      color: '#B0BEC5',
+    this.add.text(GAME_WIDTH / 2, 540, '\u00a9 2026 AFAS Software \u2014 Leusden, Nederland', {
+      fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '11px', color: '#37474F',
     }).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 560, 'Druk op ENTER of klik om te starten', {
-      fontFamily: 'Arial, Helvetica, sans-serif',
-      fontSize: '13px',
-      color: '#00529C',
+    const enterText = this.add.text(GAME_WIDTH / 2, 565, 'Druk op ENTER of klik om te starten', {
+      fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '13px', color: '#90CAF9',
     }).setOrigin(0.5);
 
-    // Bottom orange accent bar
+    this.tweens.add({
+      targets: enterText, alpha: 0.4, duration: 1500,
+      yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+    });
+
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT, GAME_WIDTH, 4, 0xF57C00).setOrigin(0.5, 1);
 
-    // Keyboard
-    this.input.keyboard.on('keydown-ENTER', () => {
-      this.startNewGame();
-    });
+    this.input.keyboard.on('keydown-ENTER', () => { this.startNewGame(); });
   }
 
   update() {
@@ -196,9 +217,7 @@ export class MenuScene extends Phaser.Scene {
   }
 
   startNewGame() {
-    // Clear any existing save
     localStorage.removeItem('afasmon_save');
-
     this.scene.start(SCENES.CHARACTER_CREATE);
   }
 
@@ -209,9 +228,8 @@ export class MenuScene extends Phaser.Scene {
       this.scene.start(SCENES.WORLD, {
         newGame: false,
         saveData: data,
+        currentZone: data.currentZone,
       });
-    } else {
-      this.startNewGame();
     }
   }
 }
