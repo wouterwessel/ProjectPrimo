@@ -3,6 +3,9 @@ import { MAX_TEAM_SIZE } from '../utils/constants.js';
 
 export class InventorySystem {
   constructor() {
+    this.playerName = 'Speler';
+    this.shirtColor = 0x00529C;
+    this.hairColor = 0x4A3728;
     this.team = [];
     this.items = {
       contract: 5,
@@ -84,6 +87,9 @@ export class InventorySystem {
 
   serialize() {
     return {
+      playerName: this.playerName,
+      shirtColor: this.shirtColor,
+      hairColor: this.hairColor,
       team: this.team.map(m => m.serialize()),
       items: { ...this.items },
       defeatedTrainers: [...this.defeatedTrainers],
@@ -103,6 +109,9 @@ export class InventorySystem {
     inv.badges = data.badges;
     inv.currentZone = data.currentZone;
     inv.storyFlags = data.storyFlags || {};
+    inv.playerName = data.playerName || 'Speler';
+    inv.shirtColor = data.shirtColor ?? 0x00529C;
+    inv.hairColor = data.hairColor ?? 0x4A3728;
     return inv;
   }
 }

@@ -199,10 +199,7 @@ export class MenuScene extends Phaser.Scene {
     // Clear any existing save
     localStorage.removeItem('afasmon_save');
 
-    this.scene.start(SCENES.WORLD, {
-      newGame: true,
-      currentZone: 'parkeerplaats',
-    });
+    this.scene.start(SCENES.CHARACTER_CREATE);
   }
 
   continueGame() {

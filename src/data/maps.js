@@ -136,7 +136,7 @@ const MAPS = {
         y: 5,
         name: 'Lisa de Receptionist',
         dialog: [
-          { speaker: 'Lisa', text: 'Welkom bij AFAS, nieuwe stagiair! Wat fijn dat je er bent!' },
+          { speaker: 'Lisa', text: 'Welkom bij AFAS, {name}! Wat fijn dat je er bent!' },
           { speaker: 'Lisa', text: 'Het is hier een beetje... anders dan normaal vandaag. Onze softwaremodules zijn tot leven gekomen!' },
           { speaker: 'Lisa', text: 'We noemen ze AFASmon. Hier, neem dit Contract — daarmee kun je ze vangen.' },
           { speaker: 'Lisa', text: 'En hier is je eerste AFASmon om je te helpen. Kies maar!' },
@@ -200,12 +200,12 @@ const MAPS = {
         y: 7,
         name: 'Junior Developer Tim',
         dialog: [
-          { speaker: 'Tim', text: 'Hey, jij bent de nieuwe stagiair? Laat eens zien wat je AFASmon kan!' },
+          { speaker: 'Tim', text: 'Hey, jij bent {name}? Laat eens zien wat je AFASmon kan!' },
         ],
         isTrainer: true,
         team: [{ species: 'pocketon', level: 6 }],
         defeatDialog: [
-          { speaker: 'Tim', text: 'Wow, niet slecht! Je bent een natuurtalent.' },
+          { speaker: 'Tim', text: 'Wow, niet slecht {name}! Je bent een natuurtalent.' },
         ],
         reward: { items: { contract: 2 }, unlocks: [] },
       },
@@ -221,7 +221,7 @@ const MAPS = {
         isTrainer: true,
         team: [{ species: 'pocketon', level: 7 }, { species: 'projecto', level: 7 }],
         defeatDialog: [
-          { speaker: 'Cas', text: 'Prima gedaan! De overlegruimtes verderop zijn nu open voor je.' },
+          { speaker: 'Cas', text: 'Prima gedaan, {name}! De overlegruimtes verderop zijn nu open voor je.' },
         ],
         reward: { items: { koffie: 2 }, unlocks: ['overlegruimtes'] },
       },
@@ -301,7 +301,7 @@ const MAPS = {
         isTrainer: true,
         team: [{ species: 'salarion', level: 9 }, { species: 'projecto', level: 9 }],
         defeatDialog: [
-          { speaker: 'Bertine', text: 'Netjes opgelost! Ga je eens melden bij de collegezalen.' },
+          { speaker: 'Bertine', text: 'Netjes opgelost, {name}! Ga je eens melden bij de collegezalen.' },
         ],
         reward: { items: { koffie: 3 }, unlocks: ['collegezalen'] },
       },
@@ -358,7 +358,7 @@ const MAPS = {
         y: 7,
         name: 'Trainer Herman',
         dialog: [
-          { speaker: 'Herman', text: 'Welkom bij de opleiding! Hier leer je alles over AFASmon-types.' },
+          { speaker: 'Herman', text: 'Welkom bij de opleiding, {name}! Hier leer je alles over AFASmon-types.' },
           { speaker: 'Herman', text: 'Doen is sterk tegen Vertrouwen, maar zwak tegen Familie.' },
           { speaker: 'Herman', text: 'Laat maar zien wat je geleerd hebt!' },
         ],
@@ -388,7 +388,7 @@ const MAPS = {
           { species: 'workflox', level: 10 },
         ],
         defeatDialog: [
-          { speaker: 'Manouk', text: 'Knap gedaan! Je bent klaar voor het echte werk.' },
+          { speaker: 'Manouk', text: 'Knap gedaan, {name}! Je bent klaar voor het echte werk.' },
         ],
         reward: { items: { contract: 3 }, unlocks: [] },
       },
@@ -434,7 +434,7 @@ const MAPS = {
         y: 3,
         name: 'Chef-kok Thijmen',
         dialog: [
-          { speaker: 'Thijmen', text: 'Welkom in het restaurant! Ik ben Thijmen, de chef-kok.' },
+          { speaker: 'Thijmen', text: 'Welkom in het restaurant, {name}! Ik ben Thijmen, de chef-kok.' },
           { speaker: 'Thijmen', text: 'Hier kun je je team volledig laten herstellen met een heerlijke maaltijd — op kosten van AFAS!' },
           { speaker: 'Systeem', text: 'Je hele team is volledig hersteld!' },
         ],
@@ -516,7 +516,7 @@ const MAPS = {
           { species: 'pocketon', level: 11 },
         ],
         defeatDialog: [
-          { speaker: 'Lars', text: 'Sterk! Je AFASmon zijn in topvorm.' },
+          { speaker: 'Lars', text: 'Sterk, {name}! Je AFASmon zijn in topvorm.' },
         ],
         reward: { items: { koffie: 5 }, unlocks: [] },
       },
@@ -650,7 +650,7 @@ const MAPS = {
           { species: 'salarion', level: 13 },
         ],
         defeatDialog: [
-          { speaker: 'Mohamed', text: 'Bravo! Standing ovation! Je bent klaar voor de directiekamer.' },
+          { speaker: 'Mohamed', text: 'Bravo, {name}! Standing ovation! Je bent klaar voor de directiekamer.' },
         ],
         reward: { items: { contract: 5, koffie: 5 }, unlocks: ['directiekamer', 'dakterras'] },
       },
@@ -764,7 +764,7 @@ const MAPS = {
         y: 8,
         name: 'CEO Bas van der Veldt',
         dialog: [
-          { speaker: 'Bas', text: 'Ah, daar ben je! Ik heb gehoord dat je alle trainers hebt verslagen.' },
+          { speaker: 'Bas', text: 'Ah, {name}! Ik heb gehoord dat je alle trainers hebt verslagen.' },
           { speaker: 'Bas', text: 'Bij AFAS geloven we in vier kernwaarden: Doen, Vertrouwen, Gek en Familie.' },
           { speaker: 'Bas', text: 'Laat zien dat je die waarden beheerst in dit laatste gevecht!' },
           { speaker: 'Bas', text: 'Als je wint, krijg je je vaste aanstelling. En misschien... een heel bijzondere AFASmon.' },
@@ -778,8 +778,8 @@ const MAPS = {
           { species: 'innovaxx', level: 18 },
         ],
         defeatDialog: [
-          { speaker: 'Bas', text: 'Ongelooflijk! Je hebt het gedaan!' },
-          { speaker: 'Bas', text: 'Gefeliciteerd met je vaste aanstelling bij AFAS Software!' },
+          { speaker: 'Bas', text: 'Ongelooflijk, {name}! Je hebt het gedaan!' },
+          { speaker: 'Bas', text: 'Gefeliciteerd met je vaste aanstelling bij AFAS Software, {name}!' },
           { speaker: 'Bas', text: 'En hier — Innovaxx is nu van jou. Zorg er goed voor.' },
           { speaker: 'Systeem', text: 'Je hebt Innovaxx gekregen! 🎉' },
           { speaker: 'Systeem', text: 'Gefeliciteerd! Je hebt AFASmon uitgespeeld! Bedankt voor het spelen!' },

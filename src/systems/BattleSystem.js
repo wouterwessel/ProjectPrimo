@@ -12,8 +12,8 @@ export class BattleSystem {
     const defStat = defender.getEffectiveStat('defense');
     const level = attacker.level;
 
-    // Pokémon-style damage formula (simplified)
-    const baseDamage = ((2 * level / 5 + 2) * move.power * (atkStat / defStat)) / 50 + 2;
+    // Pokémon-style damage formula (boosted for faster battles)
+    const baseDamage = ((2 * level / 5 + 2) * move.power * (atkStat / defStat)) / 30 + 2;
 
     // Type effectiveness
     const effectiveness = this.getTypeEffectiveness(move.type, defender.type);

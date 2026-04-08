@@ -41,6 +41,7 @@ export const TYPE_CHART = {
 export const SCENES = {
   BOOT: 'BootScene',
   MENU: 'MenuScene',
+  CHARACTER_CREATE: 'CharacterCreateScene',
   WORLD: 'WorldScene',
   BATTLE: 'BattleScene',
   DIALOG: 'DialogScene',

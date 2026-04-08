@@ -65,8 +65,11 @@ export class DialogSystem {
     });
     this.container.add(msgText);
 
-    // Typewriter effect
-    const fullText = dialog.text;
+    // Typewriter effect — resolve {name} placeholder
+    const playerName = this.scene.registry?.get('inventory')?.playerName
+      || this.scene.inventory?.playerName
+      || 'Speler';
+    const fullText = dialog.text.replace(/\{name\}/g, playerName);
     let charIndex = 0;
     this.typeTimer = scene.time.addEvent({
       delay: 25,

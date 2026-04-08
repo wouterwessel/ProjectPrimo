@@ -17,6 +17,9 @@ export class WorldScene extends Phaser.Scene {
     this.spawnZone = data.currentZone || 'parkeerplaats';
     this.spawnX = data.spawnX;
     this.spawnY = data.spawnY;
+    this.customPlayerName = data.playerName;
+    this.customShirtColor = data.shirtColor;
+    this.customHairColor = data.hairColor;
   }
 
   create() {
@@ -24,6 +27,9 @@ export class WorldScene extends Phaser.Scene {
     if (this.newGame) {
       this.inventory = new InventorySystem();
       this.inventory.currentZone = 'parkeerplaats';
+      if (this.customPlayerName) this.inventory.playerName = this.customPlayerName;
+      if (this.customShirtColor !== undefined) this.inventory.shirtColor = this.customShirtColor;
+      if (this.customHairColor !== undefined) this.inventory.hairColor = this.customHairColor;
     } else if (this.saveData) {
       this.inventory = InventorySystem.deserialize(this.saveData);
     } else {
@@ -32,6 +38,9 @@ export class WorldScene extends Phaser.Scene {
 
     // Store inventory in registry for cross-scene access
     this.registry.set('inventory', this.inventory);
+
+    // Regenerate player sprite with custom colors
+    this.regeneratePlayerSprite(this.inventory.shirtColor, this.inventory.hairColor);
 
     // Dialog system
     this.dialogSystem = new DialogSystem(this);
@@ -74,7 +83,7 @@ export class WorldScene extends Phaser.Scene {
         this.dialogSystem.show([
           { speaker: 'Verteller', text: 'Je arriveert op de parkeerplaats van het AFAS Clubhuis in Leusden...' },
           { speaker: 'Verteller', text: 'Het imposante kunstwerk "You are the World" van Lorenzo Quinn verwelkomt je.' },
-          { speaker: 'Verteller', text: 'Dit is je eerste dag als stagiair bij AFAS Software. Maar iets voelt... anders.' },
+          { speaker: 'Verteller', text: 'Dit is je eerste dag als stagiair bij AFAS Software, {name}. Maar iets voelt... anders.' },
           { speaker: 'Verteller', text: 'Gebruik de pijltjestoetsen of WASD om te bewegen. Druk op E om te interacten.' },
         ], () => {
           this.inventory.setFlag('intro_done');
@@ -100,7 +109,10 @@ export class WorldScene extends Phaser.Scene {
   loadZone(zoneName) {
     // Clear existing
     if (this.tileContainer) this.tileContainer.destroy();
-    if (this.npcSprites) this.npcSprites.forEach(n => n.sprite.destroy());
+    if (this.npcSprites) this.npcSprites.forEach(n => {
+      n.sprite.destroy();
+      if (n.marker) n.marker.destroy();
+    });
 
     this.mapData = getMap(zoneName);
     this.parsedMap = parseMap(this.mapData);
@@ -394,7 +406,7 @@ export class WorldScene extends Phaser.Scene {
         // Already defeated
         if (npc.defeatDialog) {
           this.dialogSystem.show([
-            { speaker: npc.name.split(' ').pop(), text: 'Je hebt me al verslagen! Goed gedaan.' },
+            { speaker: npc.name.split(' ').pop(), text: 'Je hebt me al verslagen, {name}! Goed gedaan.' },
           ]);
         }
         return;
@@ -482,10 +494,10 @@ export class WorldScene extends Phaser.Scene {
         container.destroy();
 
         this.dialogSystem.show([
-          { speaker: 'Lisa', text: `Goede keuze! ${starter.name} zal je goed van pas komen.` },
+          { speaker: 'Lisa', text: `Goede keuze, {name}! ${starter.name} zal je goed van pas komen.` },
           { speaker: 'Lisa', text: 'Verken het Clubhuis, vang meer AFASmon, en versla de trainers!' },
           { speaker: 'Lisa', text: 'Het Atrium is de centrale hub. Van daaruit bereik je alle gebieden.' },
-          { speaker: 'Lisa', text: 'Druk op M om je team te bekijken. Veel succes!' },
+          { speaker: 'Lisa', text: 'Druk op M om je team te bekijken. Veel succes, {name}!' },
         ], () => {
           this.updateHUD();
           this.saveGame();
@@ -633,7 +645,7 @@ export class WorldScene extends Phaser.Scene {
       .setOrigin(0, 0).setStrokeStyle(1, 0x00529C);
     this.hudContainer.add(bg);
 
-    const nameText = this.add.text(8, 4, `${lead.name} Lv.${lead.level}`, {
+    const nameText = this.add.text(8, 4, `${this.inventory.playerName} — ${lead.name} Lv.${lead.level}`, {
       fontFamily: 'Arial', fontSize: '12px', color: '#ffffff', fontStyle: 'bold',
     });
     this.hudContainer.add(nameText);
@@ -657,5 +669,36 @@ export class WorldScene extends Phaser.Scene {
   saveGame() {
     const data = this.inventory.serialize();
     localStorage.setItem('afasmon_save', JSON.stringify(data));
+  }
+
+  regeneratePlayerSprite(shirtColor, hairColor) {
+    const dirs = ['down', 'left', 'right', 'up'];
+    dirs.forEach((dir) => {
+      for (let frame = 0; frame < 2; frame++) {
+        const key = `player_${dir}_${frame}`;
+        if (this.textures.exists(key)) this.textures.remove(key);
+
+        const g = this.make.graphics({ add: false });
+        g.fillStyle(shirtColor);
+        g.fillRoundedRect(6, 10, 20, 18, 3);
+        g.fillStyle(0xFFDDB0);
+        g.beginPath(); g.arc(16, 8, 7, 0, Math.PI * 2); g.closePath(); g.fillPath();
+        g.fillStyle(hairColor);
+        if (dir === 'down') { g.fillRect(9, 2, 14, 5); }
+        else if (dir === 'up') { g.fillRect(9, 1, 14, 8); }
+        else { g.fillRect(9, 2, 14, 5); g.fillRect(dir === 'left' ? 9 : 18, 2, 5, 7); }
+        if (dir !== 'up') {
+          g.fillStyle(0x000000);
+          if (dir === 'down') { g.fillRect(12, 7, 2, 2); g.fillRect(18, 7, 2, 2); }
+          else if (dir === 'left') { g.fillRect(11, 7, 2, 2); }
+          else { g.fillRect(19, 7, 2, 2); }
+        }
+        g.fillStyle(0x333333);
+        if (frame === 0) { g.fillRect(10, 28, 5, 4); g.fillRect(18, 28, 5, 4); }
+        else { g.fillRect(8, 28, 5, 4); g.fillRect(20, 28, 5, 4); }
+        g.generateTexture(key, TILE_SIZE, TILE_SIZE);
+        g.destroy();
+      }
+    });
   }
 }

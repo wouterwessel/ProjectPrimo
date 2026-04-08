@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, SCENES } from './utils/constants.js';
 import { BootScene } from './scenes/BootScene.js';
 import { MenuScene } from './scenes/MenuScene.js';
+import { CharacterCreateScene } from './scenes/CharacterCreateScene.js';
 import { WorldScene } from './scenes/WorldScene.js';
 import { BattleScene } from './scenes/BattleScene.js';
 import { DialogScene } from './scenes/DialogScene.js';
@@ -21,7 +22,7 @@ const config = {
       debug: false,
     },
   },
-  scene: [BootScene, MenuScene, WorldScene, BattleScene, DialogScene],
+  scene: [BootScene, MenuScene, CharacterCreateScene, WorldScene, BattleScene, DialogScene],
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
