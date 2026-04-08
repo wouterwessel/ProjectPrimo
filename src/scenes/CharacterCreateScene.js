@@ -19,6 +19,14 @@ const HAIR_COLORS = [
   { label: 'Blauw', value: 0x1565C0 },
 ];
 
+const SKIN_COLORS = [
+  { label: 'Licht', value: 0xFFDDB0 },
+  { label: 'Beige', value: 0xF1C27D },
+  { label: 'Medium', value: 0xC68642 },
+  { label: 'Bruin', value: 0x8D5524 },
+  { label: 'Donker', value: 0x5C3317 },
+];
+
 export class CharacterCreateScene extends Phaser.Scene {
   constructor() {
     super({ key: SCENES.CHARACTER_CREATE });
@@ -51,6 +59,8 @@ export class CharacterCreateScene extends Phaser.Scene {
     // State
     this.shirtIndex = 0;
     this.hairIndex = 0;
+    this.skinIndex = 0;
+    this.gender = 'male';
     this.playerName = '';
 
     // === LEFT PANEL — Preview ===
@@ -75,32 +85,42 @@ export class CharacterCreateScene extends Phaser.Scene {
 
     // === RIGHT PANEL — Options ===
     const rightCx = 570;
+    let currentY = 70;
 
     // Name input
-    this.add.text(rightCx, 90, 'Jouw naam', {
-      fontFamily: 'Arial, sans-serif', fontSize: '16px', color: '#90CAF9',
+    this.add.text(rightCx, currentY, 'Jouw naam', {
+      fontFamily: 'Arial, sans-serif', fontSize: '15px', color: '#90CAF9',
     }).setOrigin(0.5);
 
-    const nameBoxY = 120;
-    this.nameBox = this.add.rectangle(rightCx, nameBoxY, 300, 40, 0x1a1a4e)
+    const nameBoxY = currentY + 26;
+    this.nameBox = this.add.rectangle(rightCx, nameBoxY, 300, 34, 0x1a1a4e)
       .setStrokeStyle(2, 0x00529C);
     this.nameText = this.add.text(rightCx, nameBoxY, '', {
-      fontFamily: 'Arial, sans-serif', fontSize: '20px', color: '#ffffff',
+      fontFamily: 'Arial, sans-serif', fontSize: '18px', color: '#ffffff',
     }).setOrigin(0.5);
     this.placeholderText = this.add.text(rightCx, nameBoxY, 'Typ je naam...', {
-      fontFamily: 'Arial, sans-serif', fontSize: '18px', color: '#546E7A',
+      fontFamily: 'Arial, sans-serif', fontSize: '16px', color: '#546E7A',
     }).setOrigin(0.5);
 
     // Cursor blink
     this.cursorVisible = true;
+    this.nameFieldFocused = false;
     this.time.addEvent({
       delay: 500, loop: true,
       callback: () => { this.cursorVisible = !this.cursorVisible; this.updateNameDisplay(); },
     });
 
+    // Click to focus name field
+    this.nameBox.setInteractive({ useHandCursor: true });
+    this.nameBox.on('pointerdown', () => {
+      this.nameFieldFocused = true;
+      this.updateNameDisplay();
+    });
+
     // Keyboard input
     this.input.keyboard.on('keydown', (event) => {
       if (event.key === 'Enter') return;
+      this.nameFieldFocused = true;
       if (event.key === 'Backspace') {
         this.playerName = this.playerName.slice(0, -1);
       } else if (event.key.length === 1 && this.playerName.length < 16) {
@@ -109,31 +129,74 @@ export class CharacterCreateScene extends Phaser.Scene {
       this.updateNameDisplay();
     });
 
+    // Gender toggle
+    currentY = nameBoxY + 42;
+    this.add.text(rightCx, currentY, 'Geslacht', {
+      fontFamily: 'Arial, sans-serif', fontSize: '15px', color: '#90CAF9',
+    }).setOrigin(0.5);
+
+    const genderY = currentY + 26;
+    const genderOptions = [
+      { label: 'Man', value: 'male' },
+      { label: 'Vrouw', value: 'female' },
+    ];
+    this.genderButtons = [];
+    genderOptions.forEach((opt, i) => {
+      const bx = rightCx + (i === 0 ? -75 : 75);
+      const isSelected = opt.value === this.gender;
+      const btnBg = this.add.rectangle(bx, genderY, 130, 30, isSelected ? 0x00529C : 0x1a1a4e)
+        .setStrokeStyle(2, isSelected ? 0xF57C00 : 0x37474F);
+      const btnText = this.add.text(bx, genderY, opt.label, {
+        fontFamily: 'Arial, sans-serif', fontSize: '14px', color: '#ffffff', fontStyle: isSelected ? 'bold' : 'normal',
+      }).setOrigin(0.5);
+      btnBg.setInteractive({ useHandCursor: true });
+      btnBg.on('pointerdown', () => {
+        this.gender = opt.value;
+        this.genderButtons.forEach((b, j) => {
+          const sel = j === i;
+          b.bg.setFillStyle(sel ? 0x00529C : 0x1a1a4e).setStrokeStyle(2, sel ? 0xF57C00 : 0x37474F);
+          b.text.setFontStyle(sel ? 'bold' : 'normal');
+        });
+        this.drawPreview();
+      });
+      this.genderButtons.push({ bg: btnBg, text: btnText });
+    });
+
+    // Skin color picker
+    currentY = genderY + 38;
+    this.add.text(rightCx, currentY, 'Huidskleur', {
+      fontFamily: 'Arial, sans-serif', fontSize: '14px', color: '#90CAF9',
+    }).setOrigin(0.5);
+    this.skinLabel = this.add.text(rightCx, currentY + 16, SKIN_COLORS[0].label, {
+      fontFamily: 'Arial, sans-serif', fontSize: '11px', color: '#78909C',
+    }).setOrigin(0.5);
+    this.createColorPicker(currentY + 46, SKIN_COLORS, 'skin', rightCx);
+
     // Shirt color picker
-    const shirtY = 190;
-    this.add.text(rightCx, shirtY, 'Shirtkleur', {
-      fontFamily: 'Arial, sans-serif', fontSize: '16px', color: '#90CAF9',
+    currentY += 86;
+    this.add.text(rightCx, currentY, 'Shirtkleur', {
+      fontFamily: 'Arial, sans-serif', fontSize: '14px', color: '#90CAF9',
     }).setOrigin(0.5);
-    this.shirtLabel = this.add.text(rightCx, shirtY + 22, SHIRT_COLORS[0].label, {
-      fontFamily: 'Arial, sans-serif', fontSize: '13px', color: '#78909C',
+    this.shirtLabel = this.add.text(rightCx, currentY + 16, SHIRT_COLORS[0].label, {
+      fontFamily: 'Arial, sans-serif', fontSize: '11px', color: '#78909C',
     }).setOrigin(0.5);
-    this.createColorPicker(shirtY + 52, SHIRT_COLORS, 'shirt', rightCx);
+    this.createColorPicker(currentY + 46, SHIRT_COLORS, 'shirt', rightCx);
 
     // Hair color picker
-    const hairY = 290;
-    this.add.text(rightCx, hairY, 'Haarkleur', {
-      fontFamily: 'Arial, sans-serif', fontSize: '16px', color: '#90CAF9',
+    currentY += 86;
+    this.add.text(rightCx, currentY, 'Haarkleur', {
+      fontFamily: 'Arial, sans-serif', fontSize: '14px', color: '#90CAF9',
     }).setOrigin(0.5);
-    this.hairLabel = this.add.text(rightCx, hairY + 22, HAIR_COLORS[0].label, {
-      fontFamily: 'Arial, sans-serif', fontSize: '13px', color: '#78909C',
+    this.hairLabel = this.add.text(rightCx, currentY + 16, HAIR_COLORS[0].label, {
+      fontFamily: 'Arial, sans-serif', fontSize: '11px', color: '#78909C',
     }).setOrigin(0.5);
-    this.createColorPicker(hairY + 52, HAIR_COLORS, 'hair', rightCx);
+    this.createColorPicker(currentY + 46, HAIR_COLORS, 'hair', rightCx);
 
     // Start button
-    const btnY = 410;
-    const btnBg = this.add.rectangle(rightCx, btnY, 300, 52, 0xF57C00)
+    currentY += 96;
+    const btnBg = this.add.rectangle(rightCx, currentY, 300, 48, 0xF57C00)
       .setStrokeStyle(2, 0xF57C00);
-    this.add.text(rightCx, btnY, 'Start je stage \u2192', {
+    this.add.text(rightCx, currentY, 'Start je stage \u2192', {
       fontFamily: 'Arial, sans-serif', fontSize: '20px', color: '#ffffff', fontStyle: 'bold',
     }).setOrigin(0.5);
 
@@ -149,28 +212,33 @@ export class CharacterCreateScene extends Phaser.Scene {
 
     this.input.keyboard.on('keydown-ENTER', () => this.startGame());
 
-    this.add.text(rightCx, btnY + 42, 'of druk op ENTER', {
+    this.add.text(rightCx, currentY + 36, 'of druk op ENTER', {
       fontFamily: 'Arial, sans-serif', fontSize: '11px', color: '#546E7A',
     }).setOrigin(0.5);
   }
 
   updateNameDisplay() {
-    const cursor = this.cursorVisible ? '|' : '';
-    this.nameText.setText(this.playerName + cursor);
-    this.placeholderText.setVisible(this.playerName.length === 0 && !this.cursorVisible);
+    if (!this.nameFieldFocused && this.playerName.length === 0) {
+      this.nameText.setText('');
+      this.placeholderText.setVisible(true);
+    } else {
+      const cursor = this.cursorVisible ? '|' : '';
+      this.nameText.setText(this.playerName + cursor);
+      this.placeholderText.setVisible(false);
+    }
   }
 
   createColorPicker(y, colors, type, centerX) {
-    const totalWidth = colors.length * 48 - 8;
-    const startX = centerX - totalWidth / 2 + 20;
+    const totalWidth = colors.length * 36 - 8;
+    const startX = centerX - totalWidth / 2 + 14;
     colors.forEach((c, i) => {
-      const x = startX + i * 48;
-      const circle = this.add.circle(x, y, 20, c.value).setStrokeStyle(3, 0x37474F);
-      if (i === 0) circle.setStrokeStyle(3, 0xF57C00);
+      const x = startX + i * 36;
+      const circle = this.add.circle(x, y, 14, c.value).setStrokeStyle(2, 0x37474F);
+      if (i === 0) circle.setStrokeStyle(2, 0xF57C00);
       circle.setInteractive({ useHandCursor: true });
       circle.on('pointerdown', () => {
-        this[`${type}Circles`].forEach(cc => cc.setStrokeStyle(3, 0x37474F));
-        circle.setStrokeStyle(3, 0xF57C00);
+        this[`${type}Circles`].forEach(cc => cc.setStrokeStyle(2, 0x37474F));
+        circle.setStrokeStyle(2, 0xF57C00);
         this[`${type}Index`] = i;
         this[`${type}Label`].setText(c.label);
         this.drawPreview();
@@ -185,6 +253,8 @@ export class CharacterCreateScene extends Phaser.Scene {
     g.clear();
     const shirtColor = SHIRT_COLORS[this.shirtIndex].value;
     const hairColor = HAIR_COLORS[this.hairIndex].value;
+    const skinColor = SKIN_COLORS[this.skinIndex].value;
+    const isFemale = this.gender === 'female';
     const scale = 6;
     const cx = this.previewCx;
     const cy = this.previewCy;
@@ -196,7 +266,7 @@ export class CharacterCreateScene extends Phaser.Scene {
     g.fillStyle(shirtColor);
     g.fillRoundedRect(cx - 10 * scale, cy, 20 * scale, 18 * scale, 3 * scale);
     // Head
-    g.fillStyle(0xFFDDB0);
+    g.fillStyle(skinColor);
     g.beginPath();
     g.arc(cx, cy - 2 * scale, 7 * scale, 0, Math.PI * 2);
     g.closePath();
@@ -204,6 +274,10 @@ export class CharacterCreateScene extends Phaser.Scene {
     // Hair
     g.fillStyle(hairColor);
     g.fillRect(cx - 7 * scale, cy - 9 * scale, 14 * scale, 5 * scale);
+    if (isFemale) {
+      g.fillRect(cx - 8 * scale, cy - 5 * scale, 4 * scale, 14 * scale);
+      g.fillRect(cx + 4 * scale, cy - 5 * scale, 4 * scale, 14 * scale);
+    }
     // Eyes
     g.fillStyle(0x000000);
     g.fillRect(cx - 4 * scale, cy - 1 * scale, 2 * scale, 2 * scale);
@@ -218,20 +292,28 @@ export class CharacterCreateScene extends Phaser.Scene {
     const name = this.playerName.trim() || 'Speler';
     const shirtColor = SHIRT_COLORS[this.shirtIndex].value;
     const hairColor = HAIR_COLORS[this.hairIndex].value;
+    const skinColor = SKIN_COLORS[this.skinIndex].value;
+    const gender = this.gender;
     this.registry.set('playerName', name);
     this.registry.set('shirtColor', shirtColor);
     this.registry.set('hairColor', hairColor);
-    this.regeneratePlayerSprite(shirtColor, hairColor);
+    this.registry.set('skinColor', skinColor);
+    this.registry.set('gender', gender);
+    this.regeneratePlayerSprite(shirtColor, hairColor, skinColor, gender);
     this.scene.start(SCENES.WORLD, {
       newGame: true,
       currentZone: 'parkeerplaats',
       playerName: name,
       shirtColor,
       hairColor,
+      skinColor,
+      gender,
     });
   }
 
-  regeneratePlayerSprite(shirtColor, hairColor) {
+  regeneratePlayerSprite(shirtColor, hairColor, skinColor, gender) {
+    const skin = skinColor || 0xFFDDB0;
+    const isFemale = gender === 'female';
     const dirs = ['down', 'left', 'right', 'up'];
     dirs.forEach((dir) => {
       for (let frame = 0; frame < 2; frame++) {
@@ -240,12 +322,20 @@ export class CharacterCreateScene extends Phaser.Scene {
         const g = this.make.graphics({ add: false });
         g.fillStyle(shirtColor);
         g.fillRoundedRect(6, 10, 20, 18, 3);
-        g.fillStyle(0xFFDDB0);
+        g.fillStyle(skin);
         g.beginPath(); g.arc(16, 8, 7, 0, Math.PI * 2); g.closePath(); g.fillPath();
         g.fillStyle(hairColor);
-        if (dir === 'down') { g.fillRect(9, 2, 14, 5); }
-        else if (dir === 'up') { g.fillRect(9, 1, 14, 8); }
-        else { g.fillRect(9, 2, 14, 5); g.fillRect(dir === 'left' ? 9 : 18, 2, 5, 7); }
+        if (dir === 'down') {
+          g.fillRect(9, 2, 14, 5);
+          if (isFemale) { g.fillRect(7, 5, 4, 12); g.fillRect(21, 5, 4, 12); }
+        } else if (dir === 'up') {
+          g.fillRect(9, 1, 14, 8);
+          if (isFemale) { g.fillRect(7, 5, 4, 12); g.fillRect(21, 5, 4, 12); }
+        } else {
+          g.fillRect(9, 2, 14, 5);
+          g.fillRect(dir === 'left' ? 9 : 18, 2, 5, 7);
+          if (isFemale) { g.fillRect(dir === 'left' ? 7 : 21, 5, 4, 12); }
+        }
         if (dir !== 'up') {
           g.fillStyle(0x000000);
           if (dir === 'down') { g.fillRect(12, 7, 2, 2); g.fillRect(18, 7, 2, 2); }

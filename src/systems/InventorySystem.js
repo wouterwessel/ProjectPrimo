@@ -6,6 +6,8 @@ export class InventorySystem {
     this.playerName = 'Speler';
     this.shirtColor = 0x00529C;
     this.hairColor = 0x4A3728;
+    this.skinColor = 0xFFDDB0;
+    this.gender = 'male';
     this.team = [];
     this.items = {
       contract: 5,
@@ -103,6 +105,8 @@ export class InventorySystem {
       playerName: this.playerName,
       shirtColor: this.shirtColor,
       hairColor: this.hairColor,
+      skinColor: this.skinColor,
+      gender: this.gender,
       team: this.team.map(m => m.serialize()),
       items: { ...this.items },
       defeatedTrainers: [...this.defeatedTrainers],
@@ -125,6 +129,8 @@ export class InventorySystem {
     inv.playerName = data.playerName || 'Speler';
     inv.shirtColor = data.shirtColor ?? 0x00529C;
     inv.hairColor = data.hairColor ?? 0x4A3728;
+    inv.skinColor = data.skinColor ?? 0xFFDDB0;
+    inv.gender = data.gender ?? 'male';
     return inv;
   }
 }

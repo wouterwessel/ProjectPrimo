@@ -20,6 +20,8 @@ export class WorldScene extends Phaser.Scene {
     this.customPlayerName = data.playerName;
     this.customShirtColor = data.shirtColor;
     this.customHairColor = data.hairColor;
+    this.customSkinColor = data.skinColor;
+    this.customGender = data.gender;
   }
 
   create() {
@@ -30,6 +32,8 @@ export class WorldScene extends Phaser.Scene {
       if (this.customPlayerName) this.inventory.playerName = this.customPlayerName;
       if (this.customShirtColor !== undefined) this.inventory.shirtColor = this.customShirtColor;
       if (this.customHairColor !== undefined) this.inventory.hairColor = this.customHairColor;
+      if (this.customSkinColor !== undefined) this.inventory.skinColor = this.customSkinColor;
+      if (this.customGender) this.inventory.gender = this.customGender;
     } else if (this.saveData) {
       this.inventory = InventorySystem.deserialize(this.saveData);
     } else {
@@ -40,7 +44,7 @@ export class WorldScene extends Phaser.Scene {
     this.registry.set('inventory', this.inventory);
 
     // Regenerate player sprite with custom colors
-    this.regeneratePlayerSprite(this.inventory.shirtColor, this.inventory.hairColor);
+    this.regeneratePlayerSprite(this.inventory.shirtColor, this.inventory.hairColor, this.inventory.skinColor, this.inventory.gender);
 
     // Dialog system
     this.dialogSystem = new DialogSystem(this);
@@ -858,7 +862,9 @@ export class WorldScene extends Phaser.Scene {
     localStorage.setItem('afasmon_save', JSON.stringify(data));
   }
 
-  regeneratePlayerSprite(shirtColor, hairColor) {
+  regeneratePlayerSprite(shirtColor, hairColor, skinColor, gender) {
+    const skin = skinColor || 0xFFDDB0;
+    const isFemale = gender === 'female';
     const dirs = ['down', 'left', 'right', 'up'];
     dirs.forEach((dir) => {
       for (let frame = 0; frame < 2; frame++) {
@@ -868,12 +874,20 @@ export class WorldScene extends Phaser.Scene {
         const g = this.make.graphics({ add: false });
         g.fillStyle(shirtColor);
         g.fillRoundedRect(6, 10, 20, 18, 3);
-        g.fillStyle(0xFFDDB0);
+        g.fillStyle(skin);
         g.beginPath(); g.arc(16, 8, 7, 0, Math.PI * 2); g.closePath(); g.fillPath();
         g.fillStyle(hairColor);
-        if (dir === 'down') { g.fillRect(9, 2, 14, 5); }
-        else if (dir === 'up') { g.fillRect(9, 1, 14, 8); }
-        else { g.fillRect(9, 2, 14, 5); g.fillRect(dir === 'left' ? 9 : 18, 2, 5, 7); }
+        if (dir === 'down') {
+          g.fillRect(9, 2, 14, 5);
+          if (isFemale) { g.fillRect(7, 5, 4, 12); g.fillRect(21, 5, 4, 12); }
+        } else if (dir === 'up') {
+          g.fillRect(9, 1, 14, 8);
+          if (isFemale) { g.fillRect(7, 5, 4, 12); g.fillRect(21, 5, 4, 12); }
+        } else {
+          g.fillRect(9, 2, 14, 5);
+          g.fillRect(dir === 'left' ? 9 : 18, 2, 5, 7);
+          if (isFemale) { g.fillRect(dir === 'left' ? 7 : 21, 5, 4, 12); }
+        }
         if (dir !== 'up') {
           g.fillStyle(0x000000);
           if (dir === 'down') { g.fillRect(12, 7, 2, 2); g.fillRect(18, 7, 2, 2); }
